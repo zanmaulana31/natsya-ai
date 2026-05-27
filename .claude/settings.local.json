@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__recallium__search_memories",
+      "mcp__recallium__session_recap",
+      "mcp__recallium__recallium",
+      "mcp__recallium__expand_memories",
+      "mcp__codegraph__codegraph_search",
+      "mcp__codegraph__codegraph_context",
+      "mcp__codegraph__codegraph_callers",
+      "mcp__codegraph__codegraph_callees",
+      "mcp__codegraph__codegraph_impact",
+      "mcp__codegraph__codegraph_node",
+      "mcp__codegraph__codegraph_status",
+      "mcp__codegraph__codegraph_files",
+      "Bash(not exist *)",
+      "mcp__recallium__store_memory"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "tessl"
+  ]
+}

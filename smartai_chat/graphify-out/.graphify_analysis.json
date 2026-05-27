@@ -1,0 +1,451 @@
+{
+  "communities": {
+    "0": [
+      "runner_flutter_window_messagehandler",
+      "runner_flutter_window_oncreate",
+      "runner_flutter_window_ondestroy",
+      "runner_win32_window_create",
+      "runner_win32_window_destroy",
+      "runner_win32_window_enablefulldpisupportifavailable",
+      "runner_win32_window_getclientarea",
+      "runner_win32_window_gethandle",
+      "runner_win32_window_getthisfromhandle",
+      "runner_win32_window_getwindowclass",
+      "runner_win32_window_messagehandler",
+      "runner_win32_window_oncreate",
+      "runner_win32_window_ondestroy",
+      "runner_win32_window_scale",
+      "runner_win32_window_setchildcontent",
+      "runner_win32_window_setquitonclose",
+      "runner_win32_window_show",
+      "runner_win32_window_unregisterwindowclass",
+      "runner_win32_window_updatetheme",
+      "runner_win32_window_windowclassregistrar",
+      "runner_win32_window_windowclassregistrar_class_registered",
+      "runner_win32_window_windowclassregistrar_getinstance",
+      "runner_win32_window_windowclassregistrar_instance",
+      "runner_win32_window_wndproc",
+      "windows_runner_flutter_window_cpp",
+      "windows_runner_flutter_window_h",
+      "windows_runner_resource_h",
+      "windows_runner_win32_window_cpp",
+      "windows_runner_win32_window_h"
+    ],
+    "1": [
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_build",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_chatscreenstate",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_dispose",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_fscaffold",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_initstate",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_onscroll",
+      "d_projects_smartai_smartai_chat_lib_screens_chat_screen_dart_scrolltobottom",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_bubble_dart_build",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_bubble_dart_padding",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_bubble_dart_sizedbox",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_build",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_container",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_dispose",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_messageinputstate",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_onchanged",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_onsend",
+      "d_projects_smartai_smartai_chat_lib_widgets_message_input_dart_sizedbox",
+      "lib_screens_chat_screen_dart",
+      "lib_widgets_message_bubble_dart",
+      "lib_widgets_message_input_dart",
+      "package_forui_forui_dart",
+      "providers_chat_provider_dart",
+      "widgets_message_bubble_dart",
+      "widgets_message_input_dart"
+    ],
+    "2": [
+      "d_projects_smartai_smartai_chat_lib_mock_mock_data_dart_mockdata",
+      "d_projects_smartai_smartai_chat_lib_models_message_dart_message",
+      "d_projects_smartai_smartai_chat_lib_providers_chat_provider_dart_chatnotifier",
+      "d_projects_smartai_smartai_chat_lib_providers_chat_provider_dart_sendmessage",
+      "d_projects_smartai_smartai_chat_test_mock_mock_data_test_dart_main",
+      "d_projects_smartai_smartai_chat_test_models_message_test_dart_main",
+      "d_projects_smartai_smartai_chat_test_providers_chat_provider_test_dart_main",
+      "lib_mock_mock_data_dart",
+      "lib_models_message_dart",
+      "lib_providers_chat_provider_dart",
+      "mock_mock_data_dart",
+      "models_message_dart",
+      "package_flutter_test_flutter_test_dart",
+      "package_smartai_chat_mock_mock_data_dart",
+      "package_smartai_chat_models_message_dart",
+      "readme_md",
+      "readme_natsya",
+      "readme_project_structure",
+      "test_mock_mock_data_test_dart",
+      "test_models_message_test_dart"
+    ],
+    "3": [
+      "d_projects_smartai_smartai_chat_lib_main_dart_build",
+      "d_projects_smartai_smartai_chat_lib_main_dart_main",
+      "d_projects_smartai_smartai_chat_lib_main_dart_materialapp",
+      "d_projects_smartai_smartai_chat_lib_main_dart_smartaiapp",
+      "d_projects_smartai_smartai_chat_lib_providers_theme_provider_dart_build",
+      "d_projects_smartai_smartai_chat_lib_providers_theme_provider_dart_themenotifier",
+      "d_projects_smartai_smartai_chat_lib_providers_theme_provider_dart_toggle",
+      "d_projects_smartai_smartai_chat_test_providers_theme_provider_test_dart_main",
+      "d_projects_smartai_smartai_chat_test_widget_test_dart_main",
+      "lib_main_dart",
+      "lib_providers_theme_provider_dart",
+      "package_flutter_material_dart",
+      "package_flutter_riverpod_flutter_riverpod_dart",
+      "package_smartai_chat_main_dart",
+      "package_smartai_chat_providers_chat_provider_dart",
+      "providers_theme_provider_dart",
+      "screens_chat_screen_dart",
+      "test_providers_theme_provider_test_dart",
+      "test_widget_test_dart"
+    ],
+    "4": [
+      "flutterappdelegate",
+      "flutterimplicitenginedelegate",
+      "ios_runner_appdelegate_swift",
+      "linux_runner_main_cc",
+      "linux_runner_my_application_h",
+      "macos_runner_appdelegate_swift",
+      "runner_appdelegate_appdelegate_applicationshouldterminateafterlastwindowclosed",
+      "runner_appdelegate_appdelegate_applicationsupportssecurerestorablestate",
+      "runner_appdelegate_appdelegate_didinitializeimplicitflutterengine",
+      "runner_main_main",
+      "runner_my_application_first_frame_cb",
+      "runner_my_application_my_application_class_init",
+      "runner_my_application_my_application_dispose",
+      "runner_my_application_my_application_init",
+      "runner_my_application_my_application_local_command_line",
+      "runner_my_application_my_application_shutdown",
+      "runner_my_application_my_application_startup",
+      "runner_my_application_myapplication_dart_entrypoint_arguments",
+      "runner_my_application_myapplication_parent_instance"
+    ],
+    "5": [
+      "web_index_html_smartai_chat",
+      "web_manifest_background_color",
+      "web_manifest_description",
+      "web_manifest_display",
+      "web_manifest_icons",
+      "web_manifest_json",
+      "web_manifest_name",
+      "web_manifest_orientation",
+      "web_manifest_prefer_related_applications",
+      "web_manifest_short_name",
+      "web_manifest_start_url",
+      "web_manifest_theme_color"
+    ],
+    "6": [
+      "flutter_generated_plugin_registrant_fl_register_plugins",
+      "flutter_generated_plugin_registrant_registerplugins",
+      "flutter_generatedpluginregistrant_registergeneratedplugins",
+      "ios_runner_generatedpluginregistrant_h",
+      "macos_runner_mainflutterwindow_swift",
+      "nswindow",
+      "plugins_generatedpluginregistrant_generatedpluginregistrant_registerwith",
+      "runner_generatedpluginregistrant_generatedpluginregistrant_registerwithregistry",
+      "runner_mainflutterwindow_mainflutterwindow_awakefromnib",
+      "runner_my_application_my_application_activate"
+    ],
+    "7": [
+      "runner_main_wwinmain",
+      "runner_utils_createandattachconsole",
+      "runner_utils_getcommandlinearguments",
+      "runner_utils_utf8fromutf16",
+      "windows_runner_main_cpp",
+      "windows_runner_utils_cpp",
+      "windows_runner_utils_h"
+    ],
+    "8": [
+      "appicon_appiconset_contents_images",
+      "appicon_appiconset_contents_info",
+      "appicon_appiconset_contents_info_author",
+      "appicon_appiconset_contents_info_version",
+      "ios_runner_assets_xcassets_appicon_appiconset_contents_json",
+      "macos_runner_assets_xcassets_appicon_appiconset_contents_json"
+    ],
+    "9": [
+      "ios_runner_assets_xcassets_launchimage_imageset_contents_json",
+      "launchimage_imageset_contents_images",
+      "launchimage_imageset_contents_info",
+      "launchimage_imageset_contents_info_author",
+      "launchimage_imageset_contents_info_version"
+    ],
+    "10": [
+      "linux_cmakelists_txt",
+      "pubspec_flutter_riverpod",
+      "pubspec_forui",
+      "pubspec_yaml",
+      "windows_cmakelists_txt"
+    ],
+    "11": [
+      "ios_runnertests_runnertests_swift",
+      "macos_runnertests_runnertests_swift",
+      "runnertests_runnertests_runnertests",
+      "runnertests_runnertests_runnertests_testexample",
+      "xctestcase"
+    ],
+    "12": [
+      "windows_flutter_cmakelists_txt_flutter",
+      "windows_flutter_cmakelists_txt_flutter_assemble",
+      "windows_flutter_cmakelists_txt_flutter_wrapper_app",
+      "windows_flutter_cmakelists_txt_flutter_wrapper_plugin",
+      "windows_runner_cmakelists_txt_runner"
+    ],
+    "13": [
+      "ephemeral_flutter_lldb_helper_handle_new_rx_page",
+      "ephemeral_flutter_lldb_helper_lldb_init_module",
+      "ephemeral_flutter_lldb_helper_rationale_8",
+      "ios_flutter_ephemeral_flutter_lldb_helper_py"
+    ],
+    "14": [
+      "flutterscenedelegate",
+      "ios_runner_scenedelegate_swift",
+      "runner_scenedelegate_scenedelegate"
+    ],
+    "15": [
+      "linux_flutter_cmakelists_txt_flutter",
+      "linux_flutter_cmakelists_txt_flutter_assemble",
+      "linux_runner_cmakelists_txt_runner"
+    ],
+    "16": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_1024x1024_1x",
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_20x20_1x"
+    ],
+    "17": [
+      "analysis_options_yaml",
+      "pubspec_flutter_lints"
+    ],
+    "18": [
+      "web_icons_icon_192",
+      "web_icons_icon_512"
+    ],
+    "19": [
+      "web_icons_icon_maskable_192",
+      "web_icons_icon_maskable_512"
+    ],
+    "20": [
+      "android_build_gradle_kts"
+    ],
+    "21": [
+      "android_settings_gradle_kts"
+    ],
+    "22": [
+      "android_app_build_gradle_kts"
+    ],
+    "23": [
+      "smartai_chat_mainactivity_mainactivity"
+    ],
+    "24": [
+      "ios_flutter_flutter_export_environment_sh"
+    ],
+    "25": [
+      "ios_runner_runner_bridging_header_h"
+    ],
+    "26": [
+      "macos_flutter_ephemeral_flutter_export_environment_sh"
+    ],
+    "27": [
+      "ios_launch_screen_assets"
+    ],
+    "28": [
+      "android_app_src_main_res_mipmap_hdpi_ic_launcher"
+    ],
+    "29": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_1x"
+    ],
+    "30": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_2x"
+    ],
+    "31": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_3x"
+    ],
+    "32": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_40x40_1x"
+    ],
+    "33": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_60x60_2x"
+    ],
+    "34": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_76x76_1x"
+    ],
+    "35": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_76x76_2x"
+    ],
+    "36": [
+      "ios_runner_assets_xcassets_appicon_appiconset_icon_app_83_5x83_5_2x"
+    ],
+    "37": [
+      "ios_runner_assets_xcassets_launchimage_imageset_launchimage"
+    ],
+    "38": [
+      "macos_runner_assets_xcassets_appicon_appiconset_app_icon_16"
+    ],
+    "39": [
+      "macos_runner_assets_xcassets_appicon_appiconset_app_icon_32"
+    ],
+    "40": [
+      "macos_runner_assets_xcassets_appicon_appiconset_app_icon_512"
+    ],
+    "41": [
+      "web_favicon"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1206896551724138,
+    "1": 0.09420289855072464,
+    "2": 0.12105263157894737,
+    "3": 0.11695906432748537,
+    "4": 0.1111111111111111,
+    "5": 0.16666666666666666,
+    "6": 0.2,
+    "7": 0.42857142857142855,
+    "8": 0.4,
+    "9": 0.4,
+    "10": 0.4,
+    "11": 0.4,
+    "12": 0.8,
+    "13": 0.5,
+    "14": 0.6666666666666666,
+    "15": 0.6666666666666666,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0
+  },
+  "gods": [
+    {
+      "id": "package_flutter_riverpod_flutter_riverpod_dart",
+      "label": "package:flutter_riverpod/flutter_riverpod.dart",
+      "degree": 7
+    },
+    {
+      "id": "runner_win32_window_create",
+      "label": "Create()",
+      "degree": 7
+    },
+    {
+      "id": "runner_win32_window_destroy",
+      "label": "Destroy()",
+      "degree": 7
+    },
+    {
+      "id": "package_flutter_material_dart",
+      "label": "package:flutter/material.dart",
+      "degree": 6
+    },
+    {
+      "id": "runner_win32_window_windowclassregistrar",
+      "label": "WindowClassRegistrar",
+      "degree": 6
+    },
+    {
+      "id": "package_flutter_test_flutter_test_dart",
+      "label": "package:flutter_test/flutter_test.dart",
+      "degree": 5
+    },
+    {
+      "id": "runner_win32_window_messagehandler",
+      "label": "MessageHandler()",
+      "degree": 5
+    },
+    {
+      "id": "appicon_appiconset_contents_info",
+      "label": "info",
+      "degree": 4
+    },
+    {
+      "id": "runnertests_runnertests_runnertests",
+      "label": "RunnerTests",
+      "degree": 4
+    },
+    {
+      "id": "package_forui_forui_dart",
+      "label": "package:forui/forui.dart",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Linux CMakeLists",
+      "target": "Pubspec",
+      "source_files": [
+        "linux/CMakeLists.txt",
+        "pubspec.yaml"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "Windows CMakeLists",
+      "target": "Pubspec",
+      "source_files": [
+        "windows/CMakeLists.txt",
+        "pubspec.yaml"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "OnCreate()",
+      "target": "RegisterPlugins()",
+      "source_files": [
+        "windows/runner/flutter_window.cpp",
+        "windows/flutter/generated_plugin_registrant.cc"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "Analysis Options",
+      "target": "flutter_lints",
+      "source_files": [
+        "analysis_options.yaml",
+        "pubspec.yaml"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "iOS App Icon (20x20 @1x)",
+      "target": "iOS App Icon (1024x1024)",
+      "source_files": [
+        "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png",
+        "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; semantically similar concepts with no structural link"
+    }
+  ],
+  "tokens": {
+    "input": 103901,
+    "output": 3787
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "repo": "smartai_chat",
+  "languages": [
+    "Python",
+    "Swift"
+  ],
+  "entrypoints": [],
+  "commands": [],
+  "top_dirs": [
+    ".dart_tool",
+    ".idea",
+    "android",
+    "graphify-out",
+    "ios",
+    "lib",
+    "linux",
+    "macos",
+    "test",
+    "web",
+    "windows"
+  ],
+  "tech_stack": [
+    "Python",
+    "Swift"
+  ],
+  "symbol_count": 0,
+  "module_scores": {
+    "ui-app": {
+      "score": 40,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "candidate",
+      "confidence": "low",
+      "evidence": [
+        {
+          "type": "path_glob",
+          "pattern": "ios/**",
+          "weight": 20,
+          "matches": [
+            "ios",
+            "ios\\Flutter",
+            "ios\\Flutter\\ephemeral",
+            "ios\\Runner",
+            "ios\\Runner\\Assets.xcassets",
+            "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset",
+            "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset",
+            "ios\\Runner\\Base.lproj",
+            "ios\\Runner.xcodeproj",
+            "ios\\Runner.xcodeproj\\project.xcworkspace"
+          ]
+        },
+        {
+          "type": "path_glob",
+          "pattern": "android/**",
+          "weight": 20,
+          "matches": [
+            "android",
+            "android\\.gradle",
+            "android\\.gradle\\8.14",
+            "android\\.gradle\\8.14\\checksums",
+            "android\\.gradle\\8.14\\executionHistory",
+            "android\\.gradle\\8.14\\expanded",
+            "android\\.gradle\\8.14\\fileChanges",
+            "android\\.gradle\\8.14\\fileHashes",
+            "android\\.gradle\\8.14\\vcsMetadata",
+            "android\\.gradle\\buildOutputCleanup"
+          ]
+        }
+      ]
+    },
+    "api": {
+      "score": 0,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "plugins": {
+      "score": 50,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "candidate",
+      "confidence": "low",
+      "evidence": [
+        {
+          "type": "path_glob",
+          "pattern": "**/plugins/**",
+          "weight": 30,
+          "matches": [
+            "android\\app\\src\\main\\java\\io\\flutter\\plugins"
+          ]
+        },
+        {
+          "type": "content_regex",
+          "pattern": "plugin|extension point|hook",
+          "weight": 20,
+          "matches": [
+            "analysis_options.yaml",
+            "android\\app\\src\\main\\java\\io\\flutter\\plugins\\GeneratedPluginRegistrant.java",
+            "graphify-out\\.graphify_analysis.json",
+            "graphify-out\\graph.json",
+            "graphify-out\\manifest.json",
+            "graphify-out\\cache\\stat-index.json",
+            "graphify-out\\cache\\ast\\1abf69d0da7851e312fdfd8e811b0146e2bf56005facf1c38eff93c78c77f92f.json",
+            "graphify-out\\cache\\ast\\1f2005401af830c75b116c55ed6f9b03d4a77c5c7b333fa202776450bab6e2f3.json",
+            "graphify-out\\cache\\ast\\24f700a86e8b62a1fcef54fba4248eec1a0bb52ecc6230917dae005a887c7ea0.json",
+            "graphify-out\\cache\\ast\\2f0acd62e98f7d1478614300f9d980c03eaebc9fb2a73e5f7ebae46c070899d2.json"
+          ]
+        }
+      ]
+    },
+    "build-and-release": {
+      "score": 0,
+      "threshold": 50,
+      "candidate_threshold": 30,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "data": {
+      "score": 20,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": [
+        {
+          "type": "path_glob",
+          "pattern": "**/models/**",
+          "weight": 20,
+          "matches": [
+            "lib\\models",
+            "test\\models"
+          ]
+        }
+      ]
+    },
+    "security": {
+      "score": 0,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "observability": {
+      "score": 0,
+      "threshold": 60,
+      "candidate_threshold": 40,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "performance": {
+      "score": 0,
+      "threshold": 50,
+      "candidate_threshold": 30,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "integrations": {
+      "score": 0,
+      "threshold": 50,
+      "candidate_threshold": 30,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "troubleshooting": {
+      "score": 0,
+      "threshold": 40,
+      "candidate_threshold": 20,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    },
+    "glossary": {
+      "score": 0,
+      "threshold": 30,
+      "candidate_threshold": 10,
+      "status": "excluded",
+      "confidence": "low",
+      "evidence": []
+    }
+  },
+  "pages": [
+    {
+      "path": "overview.md",
+      "title": "Overview",
+      "template": "overview",
+      "status": "required",
+      "module": "core"
+    },
+    {
+      "path": "getting-started/quickstart.md",
+      "title": "Quickstart",
+      "template": "quickstart",
+      "status": "required",
+      "module": "core"
+    },
+    {
+      "path": "architecture/overview.md",
+      "title": "Architecture Overview",
+      "template": "architecture",
+      "status": "required",
+      "module": "core"
+    },
+    {
+      "path": "core-components/overview.md",
+      "title": "Core Components Overview",
+      "template": "components",
+      "status": "required",
+      "module": "core"
+    },
+    {
+      "path": "development/overview.md",
+      "title": "Development Overview",
+      "template": "development",
+      "status": "required",
+      "module": "core"
+    },
+    {
+      "path": "application-lifecycle/bootstrap.md",
+      "title": "Application Bootstrap",
+      "template": "bootstrap",
+      "status": "candidate",
+      "module": "ui-app"
+    },
+    {
+      "path": "user-inference/ux-model.md",
+      "title": "UX Model",
+      "template": "ux",
+      "status": "candidate",
+      "module": "ui-app"
+    },
+    {
+      "path": "plugins/overview.md",
+      "title": "Plugins Overview",
+      "template": "plugins",
+      "status": "candidate",
+      "module": "plugins"
+    }
+  ]
+}

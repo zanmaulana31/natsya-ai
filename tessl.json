@@ -1,0 +1,27 @@
+{
+  "name": "smartai",
+  "mode": "vendored",
+  "dependencies": {
+    "tessl-labs/spec-driven-development": {
+      "version": "2.0.1"
+    },
+    "jeffallan/claude-skills": {
+      "version": "e8be415bc94d8d6ebddc2fb50e5d03c6e27d4319",
+      "source": "https://github.com/jeffallan/claude-skills",
+      "include": {
+        "skills": [
+          "flutter-expert"
+        ]
+      }
+    },
+    "samzong/samzong": {
+      "version": "8932c2ed7924f790a90c163192d52f4e82468ab4",
+      "source": "https://github.com/samzong/samzong",
+      "include": {
+        "skills": [
+          "codewiki-generator"
+        ]
+      }
+    }
+  }
+}

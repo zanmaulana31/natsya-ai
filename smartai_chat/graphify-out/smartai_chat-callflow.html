@@ -1,0 +1,2961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>smartai_chat — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>smartai_chat — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 206 nodes, 219 edges, 42 communities. Commit: unknown</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#extract-pipeline">Extraction Pipeline</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#outputs-docs">Outputs &amp; Docs</a>
+    <a href="#cli-skills">CLI &amp; Skill Installers</a>
+    <a href="#ingest-cache-update">Ingestion &amp; Updates</a>
+    <a href="#tests-fixtures">Tests &amp; Fixtures</a>
+    <a href="#windows-runner-windowcpp">Windows Runner Windowcpp</a>
+    <a href="#pubspecyaml-linux-cmakelists">Pubspecyaml Linux Cmakelists</a>
+    <a href="#runnertestsswift-runnertests-ios">Runnertestsswift Runnertests Ios</a>
+    <a href="#flutter-windows-cmakeliststxt">Flutter Windows Cmakeliststxt</a>
+    <a href="#flutter-lldb-helperpy">Flutter Lldb Helperpy</a>
+    <a href="#scenedelegateswift-ios-runner">Scenedelegateswift Ios Runner</a>
+    <a href="#flutter-linux-cmakeliststxt">Flutter Linux Cmakeliststxt</a>
+    <a href="#ios-app-icon">Ios App Icon</a>
+    <a href="#other">Other</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    EXTRACT_PIPELINE_5F350230("Extraction Pipeline<br/><small>10 nodes</small>")
+    class EXTRACT_PIPELINE_5F350230 module;
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>37 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    OUTPUTS_DOCS_ED82387C("Outputs &amp; Docs<br/><small>2 nodes</small>")
+    class OUTPUTS_DOCS_ED82387C module;
+    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>45 nodes</small>")
+    class CLI_SKILLS_9964CBB8 module;
+    INGEST_CACHE_UPDATE_FF457338("Ingestion &amp; Updates<br/><small>12 nodes</small>")
+    class INGEST_CACHE_UPDATE_FF457338 module;
+    TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>20 nodes</small>")
+    class TESTS_FIXTURES_B84B1DCC module;
+    WINDOWS_RUNNER_WINDOWCPP_797C910F("Windows Runner Windowcpp<br/><small>29 nodes</small>")
+    class WINDOWS_RUNNER_WINDOWCPP_797C910F module;
+    PUBSPECYAML_LINUX_CMAKELISTS_8DDDC9EF("Pubspecyaml Linux Cmakelists<br/><small>5 nodes</small>")
+    class PUBSPECYAML_LINUX_CMAKELISTS_8DDDC9EF module;
+    RUNNERTESTSSWIFT_RUNNERTESTS_IOS_A53471A6("Runnertestsswift Runnertests Ios<br/><small>5 nodes</small>")
+    class RUNNERTESTSSWIFT_RUNNERTESTS_IOS_A53471A6 module;
+    FLUTTER_WINDOWS_CMAKELISTSTXT_71D4CE59("Flutter Windows Cmakeliststxt<br/><small>5 nodes</small>")
+    class FLUTTER_WINDOWS_CMAKELISTSTXT_71D4CE59 module;
+    FLUTTER_LLDB_HELPERPY_8A580355("Flutter Lldb Helperpy<br/><small>4 nodes</small>")
+    class FLUTTER_LLDB_HELPERPY_8A580355 module;
+    SCENEDELEGATESWIFT_IOS_RUNNER_3A4000DC("Scenedelegateswift Ios Runner<br/><small>3 nodes</small>")
+    class SCENEDELEGATESWIFT_IOS_RUNNER_3A4000DC module;
+    FLUTTER_LINUX_CMAKELISTSTXT_48C301FF("Flutter Linux Cmakeliststxt<br/><small>3 nodes</small>")
+    class FLUTTER_LINUX_CMAKELISTSTXT_48C301FF module;
+    IOS_APP_ICON_7BDF2787("Ios App Icon<br/><small>2 nodes</small>")
+    class IOS_APP_ICON_7BDF2787 module;
+    OTHER_D0941E68("Other<br/><small>24 nodes</small>")
+    class OTHER_D0941E68 module;
+    CLI_SKILLS_9964CBB8 -->|imports x7| BUILD_GRAPH_321CBB04
+    CLI_SKILLS_9964CBB8 -->|imports x3| TESTS_FIXTURES_B84B1DCC
+    TESTS_FIXTURES_B84B1DCC -->|imports x2| CLI_SKILLS_9964CBB8
+    TESTS_FIXTURES_B84B1DCC -->|imports| BUILD_GRAPH_321CBB04
+    EXTRACT_PIPELINE_5F350230 -->|contains| CLI_SKILLS_9964CBB8
+    WINDOWS_RUNNER_WINDOWCPP_797C910F -->|imports| CLI_SKILLS_9964CBB8
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Extraction Pipeline</td><td>10</td><td><code>6</code></td></tr><tr><td>Graph Build</td><td>37</td><td><code>1, 8, 9, 20, 22</code></td></tr><tr><td>Outputs &amp; Docs</td><td>2</td><td><code>24, 26</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>45</td><td><code>3, 4, 7</code></td></tr><tr><td>Ingestion &amp; Updates</td><td>12</td><td><code>5</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>20</td><td><code>2</code></td></tr><tr><td>Windows Runner Windowcpp</td><td>29</td><td><code>0</code></td></tr><tr><td>Pubspecyaml Linux Cmakelists</td><td>5</td><td><code>10</code></td></tr><tr><td>Runnertestsswift Runnertests Ios</td><td>5</td><td><code>11</code></td></tr><tr><td>Flutter Windows Cmakeliststxt</td><td>5</td><td><code>12</code></td></tr><tr><td>Flutter Lldb Helperpy</td><td>4</td><td><code>13</code></td></tr><tr><td>Scenedelegateswift Ios Runner</td><td>3</td><td><code>14</code></td></tr><tr><td>Flutter Linux Cmakeliststxt</td><td>3</td><td><code>15</code></td></tr><tr><td>Ios App Icon</td><td>2</td><td><code>16</code></td></tr><tr><td>Other</td><td>24</td><td><code>17, 18, 19, 21, 23, 25, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Extraction Pipeline -&gt; CLI &amp; Skill Installers -&gt; Graph Build -&gt; Outputs &amp; Docs -&gt; Ingestion &amp; Updates -&gt; Tests &amp; Fixtures -&gt; Windows Runner Windowcpp</div>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Extraction Pipeline ====== -->
+<h2 id="extract-pipeline">2. Extraction Pipeline</h2>
+<p>Extraction Pipeline groups implementation around runner, flutter, macos, mainflutterwindowswift, mostly in macos/Runner/MainFlutterWindow.swift, flutter/plugins/GeneratedPluginRegistrant.java, ios/Runner/GeneratedPluginRegistrant.h. This section covers 10 nodes and 9 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Extraction Pipeline (10 nodes, 9 edges)
+    subgraph extract_pipeline_macos_Runner_MainFlutterWindow_ea37ba14["macos/Runner/MainFlutterWindow.swift"]
+        macos_runner_mainflutterwindow_swift_f7df2452("MainFlutterWindow.swift")
+        runner_mainflutterwindow_mainflutterwindow_awake_2aa8ebbe("awakeFromNib()<br/><small>macos/Runner/MainFlutterWindow.swift</small>")
+    end
+    nswindow_7059c4a7("NSWindow")
+    plugins_generatedpluginregistrant_generatedplugi_4cbb42c8("registerWith()<br/><small>flutter/plugins/GeneratedPluginRegistrant.java</small>")
+    ios_runner_generatedpluginregistrant_h_acdad5ae("GeneratedPluginRegistrant.h")
+    runner_generatedpluginregistrant_generatedplugin_d028800c("-registerWithRegistry<br/><small>ios/Runner/GeneratedPluginRegistrant.m</small>")
+    flutter_generated_plugin_registrant_fl_register_32f088ab("fl_register_plugins()<br/><small>linux/flutter/generated_plugin_registrant.cc</small>")
+    runner_my_application_my_application_activate_7432e31d("my_application_activate()<br/><small>linux/runner/my_application.cc</small>")
+    flutter_generatedpluginregistrant_registergenera_4e288eb4("RegisterGeneratedPlugins()<br/><small>macos/Flutter/GeneratedPluginRegistrant.swift</small>")
+    flutter_generated_plugin_registrant_registerplug_1fc7b15f("RegisterPlugins()<br/><small>windows/flutter/generated_plugin_registrant.cc</small>")
+    plugins_generatedpluginregistrant_generatedplugi_4cbb42c8 -->|method| ios_runner_generatedpluginregistrant_h_acdad5ae
+    ios_runner_generatedpluginregistrant_h_acdad5ae -->|method| runner_generatedpluginregistrant_generatedplugin_d028800c
+    macos_runner_mainflutterwindow_swift_f7df2452 -->|method| runner_mainflutterwindow_mainflutterwindow_awake_2aa8ebbe
+    class macos_runner_mainflutterwindow_swift_f7df2452 klass;
+    class runner_mainflutterwindow_mainflutterwindow_awake_2aa8ebbe function;
+    class nswindow_7059c4a7 klass;
+    class plugins_generatedpluginregistrant_generatedplugi_4cbb42c8 function;
+    class ios_runner_generatedpluginregistrant_h_acdad5ae klass;
+    class runner_generatedpluginregistrant_generatedplugin_d028800c function;
+    class flutter_generated_plugin_registrant_fl_register_32f088ab function;
+    class runner_my_application_my_application_activate_7432e31d function;
+    class flutter_generatedpluginregistrant_registergenera_4e288eb4 function;
+    class flutter_generated_plugin_registrant_registerplug_1fc7b15f function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>.registerWith()</code><br><small style="color:var(--muted)">flutter/plugins/GeneratedPluginRegistrant.java</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>GeneratedPluginRegistrant.h</code><br><small style="color:var(--muted)">ios/Runner/GeneratedPluginRegistrant.h</small></td>
+  <td>.registerWith() node in flutter/plugins/GeneratedPluginRegistrant.java.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>GeneratedPluginRegistrant.h</code><br><small style="color:var(--muted)">ios/Runner/GeneratedPluginRegistrant.h</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>registerWith()</code><br><small style="color:var(--muted)">flutter/plugins/GeneratedPluginRegistrant.java</small></td>
+  <td><code>-registerWithRegistry</code><br><small style="color:var(--muted)">ios/Runner/GeneratedPluginRegistrant.m</small></td>
+  <td>GeneratedPluginRegistrant.h node in ios/Runner/GeneratedPluginRegistrant.h.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>-registerWithRegistry</code><br><small style="color:var(--muted)">ios/Runner/GeneratedPluginRegistrant.m</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>GeneratedPluginRegistrant.h</code><br><small style="color:var(--muted)">ios/Runner/GeneratedPluginRegistrant.h</small></td>
+  <td>No direct outbound edge</td>
+  <td>-registerWithRegistry node in ios/Runner/GeneratedPluginRegistrant.m.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>fl_register_plugins()</code><br><small style="color:var(--muted)">linux/flutter/generated_plugin_registrant.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>my_application_activate()</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td>fl_register_plugins() node in linux/flutter/generated_plugin_registrant.cc.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>my_application_activate()</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>fl_register_plugins()</code><br><small style="color:var(--muted)">linux/flutter/generated_plugin_registrant.cc</small></td>
+  <td>No direct outbound edge</td>
+  <td>my_application_activate() node in linux/runner/my_application.cc.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>RegisterGeneratedPlugins()</code><br><small style="color:var(--muted)">macos/Flutter/GeneratedPluginRegistrant.swift</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>awakeFromNib()</code><br><small style="color:var(--muted)">macos/Runner/MainFlutterWindow.swift</small></td>
+  <td>RegisterGeneratedPlugins() node in macos/Flutter/GeneratedPluginRegistrant.swift.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>MainFlutterWindow.swift</code><br><small style="color:var(--muted)">macos/Runner/MainFlutterWindow.swift</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>awakeFromNib()</code><br><small style="color:var(--muted)">macos/Runner/MainFlutterWindow.swift</small></td>
+  <td>MainFlutterWindow.swift node in macos/Runner/MainFlutterWindow.swift.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>NSWindow</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>NSWindow node in project.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>.awakeFromNib()</code><br><small style="color:var(--muted)">macos/Runner/MainFlutterWindow.swift</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>MainFlutterWindow.swift</code><br><small style="color:var(--muted)">macos/Runner/MainFlutterWindow.swift</small><br><code>RegisterGeneratedPlugins()</code><br><small style="color:var(--muted)">macos/Flutter/GeneratedPluginRegistrant.swift</small></td>
+  <td>No direct outbound edge</td>
+  <td>.awakeFromNib() node in macos/Runner/MainFlutterWindow.swift.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>RegisterPlugins()</code><br><small style="color:var(--muted)">windows/flutter/generated_plugin_registrant.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RegisterPlugins() node in windows/flutter/generated_plugin_registrant.cc.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>macos/Runner/MainFlutterWindow.swift</code></td><td>2 nodes</td></tr>
+<tr><td><code>flutter/plugins/GeneratedPluginRegistrant.java</code></td><td>1 nodes</td></tr>
+<tr><td><code>ios/Runner/GeneratedPluginRegistrant.h</code></td><td>1 nodes</td></tr>
+<tr><td><code>ios/Runner/GeneratedPluginRegistrant.m</code></td><td>1 nodes</td></tr>
+<tr><td><code>linux/flutter/generated_plugin_registrant.cc</code></td><td>1 nodes</td></tr>
+<tr><td><code>linux/runner/my_application.cc</code></td><td>1 nodes</td></tr>
+<tr><td><code>macos/Flutter/GeneratedPluginRegistrant.swift</code></td><td>1 nodes</td></tr>
+<tr><td><code>windows/flutter/generated_plugin_registrant.cc</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: method x3, contains x3, inherits x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. Graph Build ====== -->
+<h2 id="build-graph">3. Graph Build</h2>
+<p>Graph Build groups implementation around message, widgets, contentsjson, chat, mostly in lib/screens/chat_screen.dart, lib/widgets/message_input.dart, Assets.xcassets/AppIcon.appiconset/Contents.json. This section covers 37 nodes and 36 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (37 nodes, 36 edges)
+    subgraph build_graph_Assets_xcassets_AppIcon_appiconset_C_e9f7fdf6["Assets.xcassets/AppIcon.appiconset/Contents.json"]
+        ios_runner_assets_xcassets_appicon_appiconset_co_4bef9c59("Contents.json")
+        macos_runner_assets_xcassets_appicon_appiconset_8e6ff97a("Contents.json")
+        appicon_appiconset_contents_info_author_637ab6d5("author<br/><small>Assets.xcassets/AppIcon.appiconset/Contents.json</small>")
+        appicon_appiconset_contents_images_a2db7af3("images<br/><small>Assets.xcassets/AppIcon.appiconset/Contents.json</small>")
+        appicon_appiconset_contents_info_3e58ac8a("info<br/><small>Assets.xcassets/AppIcon.appiconset/Contents.json</small>")
+        appicon_appiconset_contents_info_version_4db4d71a("version<br/><small>Assets.xcassets/AppIcon.appiconset/Contents.json</small>")
+    end
+    subgraph build_graph_Assets_xcassets_LaunchImage_imageset_ce67b51d["Assets.xcassets/LaunchImage.imageset/Contents.json"]
+        ios_runner_assets_xcassets_launchimage_imageset_5bd1c625("Contents.json")
+        launchimage_imageset_contents_info_author_ac56d6e8("author<br/><small>Assets.xcassets/LaunchImage.imageset/Contents.json</small>")
+        launchimage_imageset_contents_images_755201fd("images<br/><small>Assets.xcassets/LaunchImage.imageset/Contents.json</small>")
+        launchimage_imageset_contents_info_e0b967b2("info<br/><small>Assets.xcassets/LaunchImage.imageset/Contents.json</small>")
+        launchimage_imageset_contents_info_version_a42e5594("version<br/><small>Assets.xcassets/LaunchImage.imageset/Contents.json</small>")
+    end
+    subgraph build_graph_lib_screens_chat_screen_dart_7f2690cd["lib/screens/chat_screen.dart"]
+        lib_screens_chat_screen_dart_c177e330("chat_screen.dart")
+        providers_chat_provider_dart_462ea49c("../providers/chat provider.dart<br/><small>lib/screens/chat_screen.dart</small>")
+        widgets_message_bubble_dart_e03624f1("../widgets/message bubble.dart<br/><small>lib/screens/chat_screen.dart</small>")
+        widgets_message_input_dart_86c88c02("../widgets/message input.dart<br/><small>lib/screens/chat_screen.dart</small>")
+    end
+    package_forui_forui_dart_6187da2f("package:forui/forui.dart<br/><small>lib/main.dart</small>")
+    lib_widgets_message_bubble_dart_6314b723("message_bubble.dart")
+    lib_widgets_message_input_dart_7afc3759("message_input.dart")
+    package_forui_forui_dart_6187da2f -->|imports| lib_screens_chat_screen_dart_c177e330
+    package_forui_forui_dart_6187da2f -->|imports| lib_widgets_message_bubble_dart_6314b723
+    package_forui_forui_dart_6187da2f -->|imports| lib_widgets_message_input_dart_7afc3759
+    lib_screens_chat_screen_dart_c177e330 -->|imports| providers_chat_provider_dart_462ea49c
+    lib_screens_chat_screen_dart_c177e330 -->|imports| widgets_message_bubble_dart_e03624f1
+    lib_screens_chat_screen_dart_c177e330 -->|imports| widgets_message_input_dart_86c88c02
+    providers_chat_provider_dart_462ea49c -->|imports| lib_widgets_message_input_dart_7afc3759
+    %% Omitted for readability: 19 nodes, 0 edges
+    class ios_runner_assets_xcassets_appicon_appiconset_co_4bef9c59 klass;
+    class macos_runner_assets_xcassets_appicon_appiconset_8e6ff97a klass;
+    class appicon_appiconset_contents_info_author_637ab6d5 function;
+    class appicon_appiconset_contents_images_a2db7af3 function;
+    class appicon_appiconset_contents_info_3e58ac8a function;
+    class appicon_appiconset_contents_info_version_4db4d71a function;
+    class ios_runner_assets_xcassets_launchimage_imageset_5bd1c625 klass;
+    class launchimage_imageset_contents_info_author_ac56d6e8 function;
+    class launchimage_imageset_contents_images_755201fd function;
+    class launchimage_imageset_contents_info_e0b967b2 function;
+    class launchimage_imageset_contents_info_version_a42e5594 function;
+    class lib_screens_chat_screen_dart_c177e330 function;
+    class providers_chat_provider_dart_462ea49c function;
+    class widgets_message_bubble_dart_e03624f1 function;
+    class widgets_message_input_dart_86c88c02 function;
+    class package_forui_forui_dart_6187da2f function;
+    class lib_widgets_message_bubble_dart_6314b723 function;
+    class lib_widgets_message_input_dart_7afc3759 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>package:forui/forui.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>chat_screen.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small><br><code>message_bubble.dart</code><br><small style="color:var(--muted)">lib/widgets/message_bubble.dart</small><br><code>message_input.dart</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td>package:forui/forui.dart node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>chat_screen.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>package:forui/forui.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><code>../providers/chat provider.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small><br><code>../widgets/message bubble.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small><br><code>../widgets/message input.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>_ChatScreenState</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>initState</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>initState node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>dispose</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dispose node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>_onScroll</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>_onScroll node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>_scrollToBottom</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>_scrollToBottom node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>build</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>FScaffold</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>FScaffold node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>../providers/chat_provider.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>chat_screen.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><code>message_input.dart</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>../widgets/message_bubble.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>chat_screen.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>../widgets/message_bubble.dart node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>../widgets/message_input.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>chat_screen.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>../widgets/message_input.dart node in lib/screens/chat_screen.dart.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>message_bubble.dart</code><br><small style="color:var(--muted)">lib/widgets/message_bubble.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>package:forui/forui.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>message_bubble.dart node in lib/widgets/message_bubble.dart.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>build</code><br><small style="color:var(--muted)">lib/widgets/message_bubble.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in lib/widgets/message_bubble.dart.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>Padding</code><br><small style="color:var(--muted)">lib/widgets/message_bubble.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Padding node in lib/widgets/message_bubble.dart.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>SizedBox</code><br><small style="color:var(--muted)">lib/widgets/message_bubble.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SizedBox node in lib/widgets/message_bubble.dart.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>message_input.dart</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>../providers/chat provider.dart</code><br><small style="color:var(--muted)">lib/screens/chat_screen.dart</small><br><code>package:forui/forui.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>message_input.dart node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>_MessageInputState</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>_MessageInputState node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>dispose</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dispose node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>_onChanged</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>_onChanged node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>_onSend</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>_onSend node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>build</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>Container</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Container node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>SizedBox</code><br><small style="color:var(--muted)">lib/widgets/message_input.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SizedBox node in lib/widgets/message_input.dart.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>Contents.json</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Contents.json node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>images</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>images node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>info</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>info node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>version</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>author</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>author node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>Contents.json</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Contents.json</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Contents.json node in Assets.xcassets/AppIcon.appiconset/Contents.json.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>lib/screens/chat_screen.dart</code></td><td>11 nodes</td></tr>
+<tr><td><code>lib/widgets/message_input.dart</code></td><td>8 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Contents.json</code></td><td>5 nodes</td></tr>
+<tr><td><code>Assets.xcassets/LaunchImage.imageset/Contents.json</code></td><td>5 nodes</td></tr>
+<tr><td><code>lib/widgets/message_bubble.dart</code></td><td>4 nodes</td></tr>
+<tr><td><code>android/app/build.gradle.kts</code></td><td>1 nodes</td></tr>
+<tr><td><code>android/build.gradle.kts</code></td><td>1 nodes</td></tr>
+<tr><td><code>lib/main.dart</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: defines x17, contains x10, imports x7, references x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. Outputs & Docs ====== -->
+<h2 id="outputs-docs">4. Outputs &amp; Docs</h2>
+<p>Outputs &amp; Docs groups implementation around flutter, export, environmentsh, ios, mostly in ios/Flutter/flutter_export_environment.sh, Flutter/ephemeral/flutter_export_environment.sh. This section covers 2 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Outputs &amp; Docs (2 nodes, 0 edges)
+    macos_flutter_ephemeral_flutter_export_environme_9e28e18f("flutter export environment.sh<br/><small>Flutter/ephemeral/flutter_export_environment.sh</small>")
+    ios_flutter_flutter_export_environment_sh_91f749f3("flutter export environment.sh<br/><small>ios/Flutter/flutter_export_environment.sh</small>")
+    class macos_flutter_ephemeral_flutter_export_environme_9e28e18f function;
+    class ios_flutter_flutter_export_environment_sh_91f749f3 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>flutter_export_environment.sh</code><br><small style="color:var(--muted)">ios/Flutter/flutter_export_environment.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Exports documentation data to a target format.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>flutter_export_environment.sh</code><br><small style="color:var(--muted)">Flutter/ephemeral/flutter_export_environment.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Exports documentation data to a target format.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ios/Flutter/flutter_export_environment.sh</code></td><td>1 nodes</td></tr>
+<tr><td><code>Flutter/ephemeral/flutter_export_environment.sh</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. CLI & Skill Installers ====== -->
+<h2 id="cli-skills">5. CLI &amp; Skill Installers</h2>
+<p>CLI &amp; Skill Installers groups implementation around runner, linux, maindart, providers, mostly in lib/main.dart, linux/runner/my_application.cc, lib/providers/theme_provider.dart. This section covers 45 nodes and 48 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: CLI &amp; Skill Installers (45 nodes, 48 edges)
+    subgraph cli_skills_lib_main_dart_2a67ffe3["lib/main.dart"]
+        lib_main_dart_c7b691a8("main.dart")
+        package_flutter_riverpod_flutter_riverpod_dart_1414a07a("package:flutter riverpod/flutter riverp...<br/><small>lib/main.dart</small>")
+        package_flutter_material_dart_16a2582d("package:flutter/material.dart<br/><small>lib/main.dart</small>")
+        providers_theme_provider_dart_9ccf17fa("providers/theme provider.dart<br/><small>lib/main.dart</small>")
+        screens_chat_screen_dart_1a0a17fa("screens/chat_screen.dart<br/><small>lib/main.dart</small>")
+    end
+    subgraph cli_skills_ios_Runner_AppDelegate_swift_890d1b14["ios/Runner/AppDelegate.swift"]
+        ios_runner_appdelegate_swift_109df340("AppDelegate.swift")
+        runner_appdelegate_appdelegate_didinitializeimpl_5da4098a("didInitializeImplicitFlutterEngine()<br/><small>ios/Runner/AppDelegate.swift</small>")
+    end
+    subgraph cli_skills_macos_Runner_AppDelegate_swift_21319436["macos/Runner/AppDelegate.swift"]
+        runner_appdelegate_appdelegate_applicationshould_7bac5342("applicationShouldTerminateAfterLastWindowClosed()<br/><small>macos/Runner/AppDelegate.swift</small>")
+        runner_appdelegate_appdelegate_applicationsuppor_065c8558("applicationSupportsSecureRestorableState()<br/><small>macos/Runner/AppDelegate.swift</small>")
+    end
+    subgraph cli_skills_test_widget_test_dart_361e3a16["test/widget_test.dart"]
+        test_widget_test_dart_df961f5b("widget_test.dart")
+        package_smartai_chat_main_dart_8f9ce04c("package:smartai chat/main.dart<br/><small>test/widget_test.dart</small>")
+    end
+    subgraph cli_skills_windows_runner_utils_cpp_164df4dd["windows/runner/utils.cpp"]
+        runner_utils_getcommandlinearguments_114bc228("GetCommandLineArguments()<br/><small>windows/runner/utils.cpp</small>")
+        runner_utils_utf8fromutf16_e18e55ef("Utf8FromUtf16()<br/><small>windows/runner/utils.cpp</small>")
+    end
+    lib_providers_theme_provider_dart_c56cd7fb("theme_provider.dart")
+    linux_runner_main_cc_8b2e88da("main.cc")
+    linux_runner_my_application_h_130b56e4("my_application.h")
+    package_smartai_chat_providers_chat_provider_dar_8e39454d("package:smartai chat/providers/chat pro...<br/><small>test/providers/chat_provider_test.dart</small>")
+    test_providers_theme_provider_test_dart_4cd96b36("theme_provider_test.dart")
+    ios_runner_appdelegate_swift_109df340 -->|method| linux_runner_my_application_h_130b56e4
+    ios_runner_appdelegate_swift_109df340 -->|method| runner_appdelegate_appdelegate_didinitializeimpl_5da4098a
+    ios_runner_appdelegate_swift_109df340 -->|method| runner_appdelegate_appdelegate_applicationshould_7bac5342
+    ios_runner_appdelegate_swift_109df340 -->|method| runner_appdelegate_appdelegate_applicationsuppor_065c8558
+    runner_utils_getcommandlinearguments_114bc228 -->|calls| runner_utils_utf8fromutf16_e18e55ef
+    lib_main_dart_c7b691a8 -->|imports| package_flutter_material_dart_16a2582d
+    lib_main_dart_c7b691a8 -->|imports| package_flutter_riverpod_flutter_riverpod_dart_1414a07a
+    lib_main_dart_c7b691a8 -->|imports| providers_theme_provider_dart_9ccf17fa
+    lib_main_dart_c7b691a8 -->|imports| screens_chat_screen_dart_1a0a17fa
+    package_flutter_material_dart_16a2582d -->|imports| lib_providers_theme_provider_dart_c56cd7fb
+    package_flutter_material_dart_16a2582d -->|imports| test_providers_theme_provider_test_dart_4cd96b36
+    package_flutter_riverpod_flutter_riverpod_dart_1414a07a -->|imports| lib_providers_theme_provider_dart_c56cd7fb
+    package_flutter_riverpod_flutter_riverpod_dart_1414a07a -->|imports| test_widget_test_dart_df961f5b
+    package_flutter_riverpod_flutter_riverpod_dart_1414a07a -->|imports| test_providers_theme_provider_test_dart_4cd96b36
+    linux_runner_main_cc_8b2e88da -->|imports| linux_runner_my_application_h_130b56e4
+    test_widget_test_dart_df961f5b -->|imports| package_smartai_chat_main_dart_8f9ce04c
+    package_smartai_chat_providers_chat_provider_dar_8e39454d -->|imports| test_providers_theme_provider_test_dart_4cd96b36
+    %% Omitted for readability: 27 nodes, 0 edges
+    class lib_main_dart_c7b691a8 function;
+    class package_flutter_riverpod_flutter_riverpod_dart_1414a07a function;
+    class package_flutter_material_dart_16a2582d function;
+    class providers_theme_provider_dart_9ccf17fa function;
+    class screens_chat_screen_dart_1a0a17fa function;
+    class ios_runner_appdelegate_swift_109df340 klass;
+    class runner_appdelegate_appdelegate_didinitializeimpl_5da4098a function;
+    class runner_appdelegate_appdelegate_applicationshould_7bac5342 function;
+    class runner_appdelegate_appdelegate_applicationsuppor_065c8558 async;
+    class test_widget_test_dart_df961f5b test;
+    class package_smartai_chat_main_dart_8f9ce04c test;
+    class runner_utils_getcommandlinearguments_114bc228 entry;
+    class runner_utils_utf8fromutf16_e18e55ef function;
+    class lib_providers_theme_provider_dart_c56cd7fb function;
+    class linux_runner_main_cc_8b2e88da function;
+    class linux_runner_my_application_h_130b56e4 function;
+    class package_smartai_chat_providers_chat_provider_dar_8e39454d test;
+    class test_providers_theme_provider_test_dart_4cd96b36 test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>main.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>package:flutter riverpod/flutter riverp...</code><br><small style="color:var(--muted)">lib/main.dart</small><br><code>package:flutter/material.dart</code><br><small style="color:var(--muted)">lib/main.dart</small><br><code>providers/theme provider.dart</code><br><small style="color:var(--muted)">lib/main.dart</small><br>+1 more</td>
+  <td>main.dart node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>SmartAiApp</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SmartAiApp node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>main</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>build</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>MaterialApp</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MaterialApp node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>package:flutter/material.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><code>theme_provider.dart</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small><br><code>theme_provider_test.dart</code><br><small style="color:var(--muted)">test/providers/theme_provider_test.dart</small></td>
+  <td>package:flutter/material.dart node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>package:flutter_riverpod/flutter_riverpod.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><code>theme_provider.dart</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small><br><code>theme_provider_test.dart</code><br><small style="color:var(--muted)">test/providers/theme_provider_test.dart</small><br><code>widget_test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td>package:flutter_riverpod/flutter_riverpod.dart node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>providers/theme_provider.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>providers/theme_provider.dart node in lib/main.dart.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>screens/chat_screen.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>main.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>theme_provider.dart</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>package:flutter riverpod/flutter riverp...</code><br><small style="color:var(--muted)">lib/main.dart</small><br><code>package:flutter/material.dart</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>theme_provider.dart node in lib/providers/theme_provider.dart.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>ThemeNotifier</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ThemeNotifier node in lib/providers/theme_provider.dart.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>build</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in lib/providers/theme_provider.dart.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>toggle</code><br><small style="color:var(--muted)">lib/providers/theme_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>toggle node in lib/providers/theme_provider.dart.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>widget_test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>package:flutter riverpod/flutter riverp...</code><br><small style="color:var(--muted)">lib/main.dart</small></td>
+  <td><code>package:smartai chat/main.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>main</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in test/widget_test.dart.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>package:smartai_chat/main.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>widget_test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>package:smartai_chat/providers/chat_provider.dart</code><br><small style="color:var(--muted)">test/providers/chat_provider_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>theme_provider_test.dart</code><br><small style="color:var(--muted)">test/providers/theme_provider_test.dart</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>theme_provider_test.dart</code><br><small style="color:var(--muted)">test/providers/theme_provider_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>package:flutter riverpod/flutter riverp...</code><br><small style="color:var(--muted)">lib/main.dart</small><br><code>package:flutter/material.dart</code><br><small style="color:var(--muted)">lib/main.dart</small><br><code>package:smartai chat/providers/chat pro...</code><br><small style="color:var(--muted)">test/providers/chat_provider_test.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>main</code><br><small style="color:var(--muted)">test/providers/theme_provider_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in test/providers/theme_provider_test.dart.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>AppDelegate.swift</code><br><small style="color:var(--muted)">ios/Runner/AppDelegate.swift</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>applicationShouldTerminateAfterLastWindowClosed()</code><br><small style="color:var(--muted)">macos/Runner/AppDelegate.swift</small><br><code>applicationSupportsSecureRestorableState()</code><br><small style="color:var(--muted)">macos/Runner/AppDelegate.swift</small><br><code>didInitializeImplicitFlutterEngine()</code><br><small style="color:var(--muted)">ios/Runner/AppDelegate.swift</small><br>+1 more</td>
+  <td>AppDelegate.swift node in ios/Runner/AppDelegate.swift.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>FlutterAppDelegate</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>FlutterAppDelegate node in project.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>FlutterImplicitEngineDelegate</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>FlutterImplicitEngineDelegate node in project.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>.didInitializeImplicitFlutterEngine()</code><br><small style="color:var(--muted)">ios/Runner/AppDelegate.swift</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AppDelegate.swift</code><br><small style="color:var(--muted)">ios/Runner/AppDelegate.swift</small></td>
+  <td>No direct outbound edge</td>
+  <td>.didInitializeImplicitFlutterEngine() node in ios/Runner/AppDelegate.swift.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>main.cc</code><br><small style="color:var(--muted)">linux/runner/main.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>my_application.h</code><br><small style="color:var(--muted)">linux/runner/my_application.h</small></td>
+  <td>main.cc node in linux/runner/main.cc.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">linux/runner/main.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>my_application.h</code><br><small style="color:var(--muted)">linux/runner/my_application.h</small></td>
+  <td>main() node in linux/runner/main.cc.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>parent_instance</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>parent_instance node in linux/runner/my_application.cc.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>dart_entrypoint_arguments</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dart_entrypoint_arguments node in linux/runner/my_application.cc.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>first_frame_cb()</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>first_frame_cb() node in linux/runner/my_application.cc.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>my_application_local_command_line()</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-cmd">Entry</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>my_application_local_command_line() node in linux/runner/my_application.cc.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>my_application_startup()</code><br><small style="color:var(--muted)">linux/runner/my_application.cc</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>my_application_startup() node in linux/runner/my_application.cc.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>lib/main.dart</code></td><td>9 nodes</td></tr>
+<tr><td><code>linux/runner/my_application.cc</code></td><td>9 nodes</td></tr>
+<tr><td><code>lib/providers/theme_provider.dart</code></td><td>4 nodes</td></tr>
+<tr><td><code>windows/runner/utils.cpp</code></td><td>4 nodes</td></tr>
+<tr><td><code>macos/Runner/AppDelegate.swift</code></td><td>3 nodes</td></tr>
+<tr><td><code>test/widget_test.dart</code></td><td>3 nodes</td></tr>
+<tr><td><code>ios/Runner/AppDelegate.swift</code></td><td>2 nodes</td></tr>
+<tr><td><code>linux/runner/main.cc</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x14, contains x13, defines x11, method x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Ingestion & Updates ====== -->
+<h2 id="ingest-cache-update">6. Ingestion &amp; Updates</h2>
+<p>Ingestion &amp; Updates groups implementation around manifestjson, web, name, color, mostly in web/manifest.json, web/index.html. This section covers 12 nodes and 11 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Ingestion &amp; Updates (12 nodes, 11 edges)
+    subgraph ingest_cache_update_web_manifest_json_cda93a09["web/manifest.json"]
+        web_manifest_json_ec75ce78("manifest.json")
+        web_manifest_name_30969053("name<br/><small>web/manifest.json</small>")
+        web_manifest_short_name_d29a47d5("short_name<br/><small>web/manifest.json</small>")
+        web_manifest_start_url_59f409c4("start_url<br/><small>web/manifest.json</small>")
+        web_manifest_display_cde34fcb("display<br/><small>web/manifest.json</small>")
+        web_manifest_background_color_a227e1f2("background_color<br/><small>web/manifest.json</small>")
+        web_manifest_theme_color_ec4f0d71("theme_color<br/><small>web/manifest.json</small>")
+        web_manifest_description_41491cd8("description<br/><small>web/manifest.json</small>")
+        web_manifest_orientation_4d250bda("orientation<br/><small>web/manifest.json</small>")
+        web_manifest_prefer_related_applications_714f8abc("prefer_related_applications<br/><small>web/manifest.json</small>")
+        web_manifest_icons_1c5ea723("icons<br/><small>web/manifest.json</small>")
+    end
+    web_index_html_smartai_chat_cd4aeeda("smartai_chat<br/><small>web/index.html</small>")
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_name_30969053
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_short_name_d29a47d5
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_start_url_59f409c4
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_display_cde34fcb
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_background_color_a227e1f2
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_theme_color_ec4f0d71
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_description_41491cd8
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_orientation_4d250bda
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_prefer_related_applications_714f8abc
+    web_manifest_json_ec75ce78 -->|contains| web_manifest_icons_1c5ea723
+    web_manifest_json_ec75ce78 -->|references| web_index_html_smartai_chat_cd4aeeda
+    class web_manifest_json_ec75ce78 function;
+    class web_manifest_name_30969053 function;
+    class web_manifest_short_name_d29a47d5 function;
+    class web_manifest_start_url_59f409c4 function;
+    class web_manifest_display_cde34fcb function;
+    class web_manifest_background_color_a227e1f2 function;
+    class web_manifest_theme_color_ec4f0d71 function;
+    class web_manifest_description_41491cd8 function;
+    class web_manifest_orientation_4d250bda function;
+    class web_manifest_prefer_related_applications_714f8abc function;
+    class web_manifest_icons_1c5ea723 function;
+    class web_index_html_smartai_chat_cd4aeeda concept;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>manifest.json</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>manifest.json node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>name</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>short_name</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>short_name node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>start_url</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>start_url node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>display</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>display node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>background_color</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>background_color node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>theme_color</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>theme_color node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>description</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>description node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>orientation</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>orientation node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>prefer_related_applications</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>prefer_related_applications node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>icons</code><br><small style="color:var(--muted)">web/manifest.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>icons node in web/manifest.json.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>smartai_chat</code><br><small style="color:var(--muted)">web/index.html</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Documentation node describing smartai_chat.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>web/manifest.json</code></td><td>11 nodes</td></tr>
+<tr><td><code>web/index.html</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x10, references x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Tests & Fixtures ====== -->
+<h2 id="tests-fixtures">7. Tests &amp; Fixtures</h2>
+<p>Tests &amp; Fixtures groups implementation around mock, testdart, test, chat, mostly in lib/providers/chat_provider.dart, test/mock/mock_data_test.dart, lib/mock/mock_data.dart. This section covers 20 nodes and 23 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tests &amp; Fixtures (20 nodes, 23 edges)
+    subgraph tests_fixtures_lib_providers_chat_provider_dart_3cb691f4["lib/providers/chat_provider.dart"]
+        lib_providers_chat_provider_dart_9c5a2ff0("chat_provider.dart")
+        mock_mock_data_dart_16c46df5("../mock/mock_data.dart<br/><small>lib/providers/chat_provider.dart</small>")
+        d_projects_smartai_smartai_chat_lib_providers_ch_64fd48c5("ChatNotifier<br/><small>lib/providers/chat_provider.dart</small>")
+        d_projects_smartai_smartai_chat_lib_providers_ch_79202ab1("sendMessage<br/><small>lib/providers/chat_provider.dart</small>")
+    end
+    subgraph tests_fixtures_test_mock_mock_data_test_dart_6e1d8725["test/mock/mock_data_test.dart"]
+        test_mock_mock_data_test_dart_f4e8d6cf("mock_data_test.dart")
+        package_smartai_chat_models_message_dart_bff0d0b4("package:smartai chat/models/message.dart<br/><small>test/mock/mock_data_test.dart</small>")
+        package_smartai_chat_mock_mock_data_dart_38707e4b("package:smartai chat/mock/mock data.dart<br/><small>test/mock/mock_data_test.dart</small>")
+        d_projects_smartai_smartai_chat_test_mock_mock_d_8944738d("main<br/><small>test/mock/mock_data_test.dart</small>")
+    end
+    subgraph tests_fixtures_lib_mock_mock_data_dart_dafd0d19["lib/mock/mock_data.dart"]
+        lib_mock_mock_data_dart_cdf709e2("mock_data.dart")
+        models_message_dart_555c0d11("../models/message.dart<br/><small>lib/mock/mock_data.dart</small>")
+        d_projects_smartai_smartai_chat_lib_mock_mock_da_705f8124("MockData<br/><small>lib/mock/mock_data.dart</small>")
+    end
+    subgraph tests_fixtures_README_md_cf9e8ee2["README.md"]
+        readme_natsya_fe251f75("Natsya AI Assistant<br/><small>README.md</small>")
+        readme_project_structure_2ab0b538("Project Structure<br/><small>README.md</small>")
+    end
+    subgraph tests_fixtures_lib_models_message_dart_daa96c31["lib/models/message.dart"]
+        d_projects_smartai_smartai_chat_lib_models_messa_ef4c215d("Message<br/><small>lib/models/message.dart</small>")
+        lib_models_message_dart_21eb31b7("message.dart")
+    end
+    subgraph tests_fixtures_test_models_message_test_dart_d384a632["test/models/message_test.dart"]
+        test_models_message_test_dart_3634c62c("message_test.dart")
+        d_projects_smartai_smartai_chat_test_models_mess_18c3ec0d("main<br/><small>test/models/message_test.dart</small>")
+    end
+    package_flutter_test_flutter_test_dart_878563e1("package:flutter test/flutter test.dart<br/><small>test/widget_test.dart</small>")
+    lib_mock_mock_data_dart_cdf709e2 -->|imports| models_message_dart_555c0d11
+    models_message_dart_555c0d11 -->|imports| lib_providers_chat_provider_dart_9c5a2ff0
+    lib_providers_chat_provider_dart_9c5a2ff0 -->|imports| mock_mock_data_dart_16c46df5
+    lib_providers_chat_provider_dart_9c5a2ff0 -->|imports| package_flutter_test_flutter_test_dart_878563e1
+    lib_providers_chat_provider_dart_9c5a2ff0 -->|imports| package_smartai_chat_models_message_dart_bff0d0b4
+    package_flutter_test_flutter_test_dart_878563e1 -->|imports| test_mock_mock_data_test_dart_f4e8d6cf
+    package_flutter_test_flutter_test_dart_878563e1 -->|imports| test_models_message_test_dart_3634c62c
+    test_mock_mock_data_test_dart_f4e8d6cf -->|imports| package_smartai_chat_mock_mock_data_dart_38707e4b
+    test_mock_mock_data_test_dart_f4e8d6cf -->|imports| package_smartai_chat_models_message_dart_bff0d0b4
+    package_smartai_chat_models_message_dart_bff0d0b4 -->|imports| test_models_message_test_dart_3634c62c
+    %% Omitted for readability: 2 nodes, 0 edges
+    class lib_providers_chat_provider_dart_9c5a2ff0 function;
+    class mock_mock_data_dart_16c46df5 function;
+    class d_projects_smartai_smartai_chat_lib_providers_ch_64fd48c5 klass;
+    class d_projects_smartai_smartai_chat_lib_providers_ch_79202ab1 function;
+    class test_mock_mock_data_test_dart_f4e8d6cf test;
+    class package_smartai_chat_models_message_dart_bff0d0b4 test;
+    class package_smartai_chat_mock_mock_data_dart_38707e4b test;
+    class d_projects_smartai_smartai_chat_test_mock_mock_d_8944738d test;
+    class lib_mock_mock_data_dart_cdf709e2 function;
+    class models_message_dart_555c0d11 function;
+    class d_projects_smartai_smartai_chat_lib_mock_mock_da_705f8124 klass;
+    class readme_natsya_fe251f75 klass;
+    class readme_project_structure_2ab0b538 klass;
+    class d_projects_smartai_smartai_chat_lib_models_messa_ef4c215d klass;
+    class lib_models_message_dart_21eb31b7 function;
+    class test_models_message_test_dart_3634c62c test;
+    class d_projects_smartai_smartai_chat_test_models_mess_18c3ec0d test;
+    class package_flutter_test_flutter_test_dart_878563e1 test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>mock_data.dart</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>../models/message.dart</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td>mock_data.dart node in lib/mock/mock_data.dart.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>MockData</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MockData node in lib/mock/mock_data.dart.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>../models/message.dart</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>mock_data.dart</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td><code>chat_provider.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td>../models/message.dart node in lib/mock/mock_data.dart.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>message.dart</code><br><small style="color:var(--muted)">lib/models/message.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>message.dart node in lib/models/message.dart.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>Message</code><br><small style="color:var(--muted)">lib/models/message.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Message node in lib/models/message.dart.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>chat_provider.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>../models/message.dart</code><br><small style="color:var(--muted)">lib/mock/mock_data.dart</small></td>
+  <td><code>../mock/mock_data.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small><br><code>package:flutter test/flutter test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small><br><code>package:smartai chat/models/message.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>ChatNotifier</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>sendMessage</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>sendMessage node in lib/providers/chat_provider.dart.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>../mock/mock_data.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>chat_provider.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>../mock/mock_data.dart node in lib/providers/chat_provider.dart.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>package:flutter_test/flutter_test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>chat_provider.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small></td>
+  <td><code>message_test.dart</code><br><small style="color:var(--muted)">test/models/message_test.dart</small><br><code>mock_data_test.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>mock_data_test.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>package:flutter test/flutter test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small></td>
+  <td><code>package:smartai chat/mock/mock data.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small><br><code>package:smartai chat/models/message.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>main</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in test/mock/mock_data_test.dart.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>package:smartai_chat/mock/mock_data.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>mock_data_test.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>package:smartai_chat/models/message.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>chat_provider.dart</code><br><small style="color:var(--muted)">lib/providers/chat_provider.dart</small><br><code>mock_data_test.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td><code>message_test.dart</code><br><small style="color:var(--muted)">test/models/message_test.dart</small></td>
+  <td>Supports retrieval-augmented Q&amp;A or streaming chat.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>message_test.dart</code><br><small style="color:var(--muted)">test/models/message_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>package:flutter test/flutter test.dart</code><br><small style="color:var(--muted)">test/widget_test.dart</small><br><code>package:smartai chat/models/message.dart</code><br><small style="color:var(--muted)">test/mock/mock_data_test.dart</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>main</code><br><small style="color:var(--muted)">test/models/message_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in test/models/message_test.dart.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>main</code><br><small style="color:var(--muted)">test/providers/chat_provider_test.dart</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main node in test/providers/chat_provider_test.dart.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>README</code><br><small style="color:var(--muted)">README.md</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Documentation node describing README.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>Natsya AI Assistant</code><br><small style="color:var(--muted)">README.md</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Natsya AI Assistant node in README.md.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>Project Structure</code><br><small style="color:var(--muted)">README.md</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Project Structure node in README.md.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>lib/providers/chat_provider.dart</code></td><td>4 nodes</td></tr>
+<tr><td><code>test/mock/mock_data_test.dart</code></td><td>4 nodes</td></tr>
+<tr><td><code>README.md</code></td><td>3 nodes</td></tr>
+<tr><td><code>lib/mock/mock_data.dart</code></td><td>3 nodes</td></tr>
+<tr><td><code>lib/models/message.dart</code></td><td>2 nodes</td></tr>
+<tr><td><code>test/models/message_test.dart</code></td><td>2 nodes</td></tr>
+<tr><td><code>test/providers/chat_provider_test.dart</code></td><td>1 nodes</td></tr>
+<tr><td><code>test/widget_test.dart</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x10, defines x7, references x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Windows Runner Windowcpp ====== -->
+<h2 id="windows-runner-windowcpp">8. Windows Runner Windowcpp</h2>
+<p>Windows Runner Windowcpp groups implementation around windows, runner, windowcpp, win32, mostly in windows/runner/win32_window.cpp, windows/runner/flutter_window.cpp, windows/runner/flutter_window.h. This section covers 29 nodes and 49 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Windows Runner Windowcpp (29 nodes, 49 edges)
+    subgraph windows_runner_windowcpp_windows_runner_win32_wi_9806b790["windows/runner/win32_window.cpp"]
+        runner_win32_window_messagehandler_cb03391d("MessageHandler()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_windowclassregistrar_getinst_900ea191("GetInstance()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_wndproc_c7087f36("WndProc()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_enablefulldpisupportifavaila_7fd23fa3("EnableFullDpiSupportIfAvailable()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_getwindowclass_0d534a88("GetWindowClass()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_scale_62a045ce("Scale()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_create_d6d80764("Create()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_windowclassregistrar_d78859ad("WindowClassRegistrar<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_destroy_127808aa("Destroy()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_unregisterwindowclass_25a9690b("UnregisterWindowClass()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_updatetheme_ccf5c7fd("UpdateTheme()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_oncreate_a09b8a4a("OnCreate()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_getthisfromhandle_3e1a6447("GetThisFromHandle()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_getclientarea_c579c726("GetClientArea()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_ondestroy_88464b4b("OnDestroy()<br/><small>windows/runner/win32_window.cpp</small>")
+        runner_win32_window_setchildcontent_6d5f808a("SetChildContent()<br/><small>windows/runner/win32_window.cpp</small>")
+    end
+    windows_runner_flutter_window_h_4502b47a("flutter_window.h")
+    windows_runner_win32_window_h_4b1c49d2("win32_window.h")
+    runner_win32_window_scale_62a045ce -->|calls| runner_win32_window_create_d6d80764
+    runner_win32_window_enablefulldpisupportifavaila_7fd23fa3 -->|calls| runner_win32_window_wndproc_c7087f36
+    runner_win32_window_windowclassregistrar_d78859ad -->|method| runner_win32_window_windowclassregistrar_getinst_900ea191
+    runner_win32_window_windowclassregistrar_getinst_900ea191 -->|calls| runner_win32_window_create_d6d80764
+    runner_win32_window_windowclassregistrar_getinst_900ea191 -->|calls| runner_win32_window_destroy_127808aa
+    runner_win32_window_getwindowclass_0d534a88 -->|calls| runner_win32_window_create_d6d80764
+    runner_win32_window_unregisterwindowclass_25a9690b -->|calls| runner_win32_window_destroy_127808aa
+    runner_win32_window_create_d6d80764 -->|calls| runner_win32_window_destroy_127808aa
+    runner_win32_window_create_d6d80764 -->|calls| runner_win32_window_updatetheme_ccf5c7fd
+    runner_win32_window_create_d6d80764 -->|calls| runner_win32_window_oncreate_a09b8a4a
+    runner_win32_window_wndproc_c7087f36 -->|calls| runner_win32_window_getthisfromhandle_3e1a6447
+    runner_win32_window_wndproc_c7087f36 -->|calls| runner_win32_window_messagehandler_cb03391d
+    runner_win32_window_messagehandler_cb03391d -->|calls| runner_win32_window_destroy_127808aa
+    runner_win32_window_messagehandler_cb03391d -->|calls| runner_win32_window_getclientarea_c579c726
+    runner_win32_window_messagehandler_cb03391d -->|calls| runner_win32_window_updatetheme_ccf5c7fd
+    runner_win32_window_destroy_127808aa -->|calls| windows_runner_win32_window_h_4b1c49d2
+    runner_win32_window_destroy_127808aa -->|calls| runner_win32_window_ondestroy_88464b4b
+    runner_win32_window_setchildcontent_6d5f808a -->|calls| runner_win32_window_getclientarea_c579c726
+    windows_runner_flutter_window_h_4502b47a -->|imports| windows_runner_win32_window_h_4b1c49d2
+    %% Omitted for readability: 11 nodes, 0 edges
+    class runner_win32_window_messagehandler_cb03391d function;
+    class runner_win32_window_windowclassregistrar_getinst_900ea191 function;
+    class runner_win32_window_wndproc_c7087f36 function;
+    class runner_win32_window_enablefulldpisupportifavaila_7fd23fa3 function;
+    class runner_win32_window_getwindowclass_0d534a88 function;
+    class runner_win32_window_scale_62a045ce function;
+    class runner_win32_window_create_d6d80764 function;
+    class runner_win32_window_windowclassregistrar_d78859ad klass;
+    class runner_win32_window_destroy_127808aa function;
+    class runner_win32_window_unregisterwindowclass_25a9690b function;
+    class runner_win32_window_updatetheme_ccf5c7fd function;
+    class runner_win32_window_oncreate_a09b8a4a function;
+    class runner_win32_window_getthisfromhandle_3e1a6447 function;
+    class runner_win32_window_getclientarea_c579c726 entry;
+    class runner_win32_window_ondestroy_88464b4b function;
+    class runner_win32_window_setchildcontent_6d5f808a function;
+    class windows_runner_flutter_window_h_4502b47a function;
+    class windows_runner_win32_window_h_4b1c49d2 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>flutter_window.cpp</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>flutter_window.cpp node in windows/runner/flutter_window.cpp.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>OnCreate()</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>GetClientArea()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>SetChildContent()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>OnCreate() node in windows/runner/flutter_window.cpp.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>OnDestroy()</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>OnDestroy() node in windows/runner/flutter_window.cpp.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MessageHandler() node in windows/runner/flutter_window.cpp.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>flutter_window.h</code><br><small style="color:var(--muted)">windows/runner/flutter_window.h</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>win32_window.h</code><br><small style="color:var(--muted)">windows/runner/win32_window.h</small></td>
+  <td>flutter_window.h node in windows/runner/flutter_window.h.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>resource.h</code><br><small style="color:var(--muted)">windows/runner/resource.h</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>win32_window.cpp</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>resource.h node in windows/runner/resource.h.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>win32_window.cpp</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>resource.h</code><br><small style="color:var(--muted)">windows/runner/resource.h</small></td>
+  <td>No direct outbound edge</td>
+  <td>win32_window.cpp node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>Scale()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>Scale() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>EnableFullDpiSupportIfAvailable()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>WndProc()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>EnableFullDpiSupportIfAvailable() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>WindowClassRegistrar</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>GetInstance()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>WindowClassRegistrar node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>.GetInstance()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>WindowClassRegistrar</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>.GetInstance() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>instance_</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>instance_ node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>class_registered_</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>class_registered_ node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>GetWindowClass()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>GetWindowClass() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>UnregisterWindowClass()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>UnregisterWindowClass() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>GetInstance()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>GetWindowClass()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>Scale()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>OnCreate()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>UpdateTheme()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>Create() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>Show()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Show() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>WndProc()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>EnableFullDpiSupportIfAvailable()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><code>GetThisFromHandle()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>WndProc() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>WndProc()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>GetClientArea()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>UpdateTheme()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>MessageHandler() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>GetInstance()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br>+1 more</td>
+  <td><code>OnDestroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>win32_window.h</code><br><small style="color:var(--muted)">windows/runner/win32_window.h</small></td>
+  <td>Destroy() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>GetThisFromHandle()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>WndProc()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>No direct outbound edge</td>
+  <td>GetThisFromHandle() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>SetChildContent()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>OnCreate()</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small></td>
+  <td><code>GetClientArea()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>SetChildContent() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>GetClientArea()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-cmd">Entry</span></td>
+  <td><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>OnCreate()</code><br><small style="color:var(--muted)">windows/runner/flutter_window.cpp</small><br><code>SetChildContent()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>No direct outbound edge</td>
+  <td>GetClientArea() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>GetHandle()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>GetHandle() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>SetQuitOnClose()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SetQuitOnClose() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>OnCreate()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>No direct outbound edge</td>
+  <td>OnCreate() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>OnDestroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>No direct outbound edge</td>
+  <td>OnDestroy() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>UpdateTheme()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>Create()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>MessageHandler()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small></td>
+  <td>No direct outbound edge</td>
+  <td>UpdateTheme() node in windows/runner/win32_window.cpp.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>win32_window.h</code><br><small style="color:var(--muted)">windows/runner/win32_window.h</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>Destroy()</code><br><small style="color:var(--muted)">windows/runner/win32_window.cpp</small><br><code>flutter_window.h</code><br><small style="color:var(--muted)">windows/runner/flutter_window.h</small></td>
+  <td>No direct outbound edge</td>
+  <td>win32_window.h node in windows/runner/win32_window.h.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>windows/runner/win32_window.cpp</code></td><td>22 nodes</td></tr>
+<tr><td><code>windows/runner/flutter_window.cpp</code></td><td>4 nodes</td></tr>
+<tr><td><code>windows/runner/flutter_window.h</code></td><td>1 nodes</td></tr>
+<tr><td><code>windows/runner/resource.h</code></td><td>1 nodes</td></tr>
+<tr><td><code>windows/runner/win32_window.h</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x23, calls x17, defines x4, imports x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Pubspecyaml Linux Cmakelists ====== -->
+<h2 id="pubspecyaml-linux-cmakelists">9. Pubspecyaml Linux Cmakelists</h2>
+<p>Pubspecyaml Linux Cmakelists groups implementation around pubspecyaml, linux, cmakelists, cmakeliststxt, mostly in pubspec.yaml, linux/CMakeLists.txt, windows/CMakeLists.txt. This section covers 5 nodes and 4 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Pubspecyaml Linux Cmakelists (5 nodes, 4 edges)
+    subgraph pubspecyaml_linux_cmakelists_pubspec_yaml_2bec0663["pubspec.yaml"]
+        pubspec_yaml_c676a2fa("Pubspec<br/><small>pubspec.yaml</small>")
+        pubspec_forui_b2a37001("forui<br/><small>pubspec.yaml</small>")
+        pubspec_flutter_riverpod_eb2a4d1a("flutter_riverpod<br/><small>pubspec.yaml</small>")
+    end
+    linux_cmakelists_txt_057c76db("Linux CMakeLists<br/><small>linux/CMakeLists.txt</small>")
+    windows_cmakelists_txt_cc477286("Windows CMakeLists<br/><small>windows/CMakeLists.txt</small>")
+    pubspec_yaml_c676a2fa -->|references| pubspec_forui_b2a37001
+    pubspec_yaml_c676a2fa -->|references| pubspec_flutter_riverpod_eb2a4d1a
+    pubspec_yaml_c676a2fa -->|references| linux_cmakelists_txt_057c76db
+    pubspec_yaml_c676a2fa -->|references| windows_cmakelists_txt_cc477286
+    class pubspec_yaml_c676a2fa test;
+    class pubspec_forui_b2a37001 test;
+    class pubspec_flutter_riverpod_eb2a4d1a test;
+    class linux_cmakelists_txt_057c76db klass;
+    class windows_cmakelists_txt_cc477286 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>Pubspec</code><br><small style="color:var(--muted)">pubspec.yaml</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Pubspec node in pubspec.yaml.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>forui</code><br><small style="color:var(--muted)">pubspec.yaml</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>forui node in pubspec.yaml.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>flutter_riverpod</code><br><small style="color:var(--muted)">pubspec.yaml</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>flutter_riverpod node in pubspec.yaml.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>Linux CMakeLists</code><br><small style="color:var(--muted)">linux/CMakeLists.txt</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Linux CMakeLists node in linux/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>Windows CMakeLists</code><br><small style="color:var(--muted)">windows/CMakeLists.txt</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Windows CMakeLists node in windows/CMakeLists.txt.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>pubspec.yaml</code></td><td>3 nodes</td></tr>
+<tr><td><code>linux/CMakeLists.txt</code></td><td>1 nodes</td></tr>
+<tr><td><code>windows/CMakeLists.txt</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: references x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 10. Runnertestsswift Runnertests Ios ====== -->
+<h2 id="runnertestsswift-runnertests-ios">10. Runnertestsswift Runnertests Ios</h2>
+<p>Runnertestsswift Runnertests Ios groups implementation around runnertestsswift, runnertests, ios, xctestcase, mostly in ios/RunnerTests/RunnerTests.swift, macos/RunnerTests/RunnerTests.swift. This section covers 5 nodes and 4 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Runnertestsswift Runnertests Ios (5 nodes, 4 edges)
+    subgraph runnertestsswift_runnertests_ios_ios_RunnerTests_7968109d["ios/RunnerTests/RunnerTests.swift"]
+        runnertests_runnertests_runnertests_2061af75("RunnerTests<br/><small>ios/RunnerTests/RunnerTests.swift</small>")
+        runnertests_runnertests_runnertests_testexample_337235ec("testExample()<br/><small>ios/RunnerTests/RunnerTests.swift</small>")
+        ios_runnertests_runnertests_swift_87d92547("RunnerTests.swift")
+    end
+    xctestcase_ec95fdd2("XCTestCase")
+    macos_runnertests_runnertests_swift_5830ddff("RunnerTests.swift")
+    runnertests_runnertests_runnertests_2061af75 -->|method| runnertests_runnertests_runnertests_testexample_337235ec
+    class runnertests_runnertests_runnertests_2061af75 test;
+    class runnertests_runnertests_runnertests_testexample_337235ec test;
+    class ios_runnertests_runnertests_swift_87d92547 test;
+    class xctestcase_ec95fdd2 klass;
+    class macos_runnertests_runnertests_swift_5830ddff test;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>RunnerTests.swift</code><br><small style="color:var(--muted)">ios/RunnerTests/RunnerTests.swift</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>RunnerTests</code><br><small style="color:var(--muted)">ios/RunnerTests/RunnerTests.swift</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>testExample()</code><br><small style="color:var(--muted)">ios/RunnerTests/RunnerTests.swift</small></td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>XCTestCase</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>.testExample()</code><br><small style="color:var(--muted)">ios/RunnerTests/RunnerTests.swift</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td><code>RunnerTests</code><br><small style="color:var(--muted)">ios/RunnerTests/RunnerTests.swift</small></td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>RunnerTests.swift</code><br><small style="color:var(--muted)">macos/RunnerTests/RunnerTests.swift</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Verifies imports, entry points, or version behavior.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ios/RunnerTests/RunnerTests.swift</code></td><td>3 nodes</td></tr>
+<tr><td><code>macos/RunnerTests/RunnerTests.swift</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x2, inherits x1, method x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 11. Flutter Windows Cmakeliststxt ====== -->
+<h2 id="flutter-windows-cmakeliststxt">11. Flutter Windows Cmakeliststxt</h2>
+<p>Flutter Windows Cmakeliststxt groups implementation around flutter, windows, cmakeliststxt, wrapper, mostly in windows/flutter/CMakeLists.txt, windows/runner/CMakeLists.txt. This section covers 5 nodes and 8 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Flutter Windows Cmakeliststxt (5 nodes, 8 edges)
+    subgraph flutter_windows_cmakeliststxt_windows_flutter_CM_4042627b["windows/flutter/CMakeLists.txt"]
+        windows_flutter_cmakelists_txt_flutter_b92d1761("flutter<br/><small>windows/flutter/CMakeLists.txt</small>")
+        windows_flutter_cmakelists_txt_flutter_wrapper_a_f22aaaa7("flutter_wrapper_app<br/><small>windows/flutter/CMakeLists.txt</small>")
+        windows_flutter_cmakelists_txt_flutter_wrapper_p_7753bc93("flutter_wrapper_plugin<br/><small>windows/flutter/CMakeLists.txt</small>")
+        windows_flutter_cmakelists_txt_flutter_assemble_d9463ec8("flutter_assemble<br/><small>windows/flutter/CMakeLists.txt</small>")
+    end
+    windows_runner_cmakelists_txt_runner_8e976c31("runner<br/><small>windows/runner/CMakeLists.txt</small>")
+    windows_flutter_cmakelists_txt_flutter_b92d1761 -->|calls| windows_flutter_cmakelists_txt_flutter_wrapper_p_7753bc93
+    windows_flutter_cmakelists_txt_flutter_b92d1761 -->|calls| windows_flutter_cmakelists_txt_flutter_wrapper_a_f22aaaa7
+    windows_flutter_cmakelists_txt_flutter_b92d1761 -->|calls| windows_runner_cmakelists_txt_runner_8e976c31
+    windows_flutter_cmakelists_txt_flutter_wrapper_a_f22aaaa7 -->|calls| windows_runner_cmakelists_txt_runner_8e976c31
+    class windows_flutter_cmakelists_txt_flutter_b92d1761 function;
+    class windows_flutter_cmakelists_txt_flutter_wrapper_a_f22aaaa7 function;
+    class windows_flutter_cmakelists_txt_flutter_wrapper_p_7753bc93 function;
+    class windows_flutter_cmakelists_txt_flutter_assemble_d9463ec8 async;
+    class windows_runner_cmakelists_txt_runner_8e976c31 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>flutter_assemble</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-async">Async</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>flutter_assemble node in windows/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>flutter_wrapper_app</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small><br><code>flutter_wrapper_plugin</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small><br><code>runner</code><br><small style="color:var(--muted)">windows/runner/CMakeLists.txt</small></td>
+  <td>flutter node in windows/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>flutter_wrapper_plugin</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td>No direct outbound edge</td>
+  <td>flutter_wrapper_plugin node in windows/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>flutter_wrapper_app</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td><code>runner</code><br><small style="color:var(--muted)">windows/runner/CMakeLists.txt</small></td>
+  <td>flutter_wrapper_app node in windows/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>runner</code><br><small style="color:var(--muted)">windows/runner/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small><br><code>flutter_wrapper_app</code><br><small style="color:var(--muted)">windows/flutter/CMakeLists.txt</small></td>
+  <td>No direct outbound edge</td>
+  <td>runner node in windows/runner/CMakeLists.txt.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>windows/flutter/CMakeLists.txt</code></td><td>4 nodes</td></tr>
+<tr><td><code>windows/runner/CMakeLists.txt</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: references x4, calls x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 12. Flutter Lldb Helperpy ====== -->
+<h2 id="flutter-lldb-helperpy">12. Flutter Lldb Helperpy</h2>
+<p>Flutter Lldb Helperpy groups implementation around flutter, lldb, helperpy, ios, mostly in Flutter/ephemeral/flutter_lldb_helper.py. This section covers 4 nodes and 3 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Flutter Lldb Helperpy (4 nodes, 3 edges)
+    ios_flutter_ephemeral_flutter_lldb_helper_py_f9b4567b("flutter_lldb_helper.py")
+    ephemeral_flutter_lldb_helper_handle_new_rx_page_1ba1facc("handle_new_rx_page()<br/><small>Flutter/ephemeral/flutter_lldb_helper.py</small>")
+    ephemeral_flutter_lldb_helper_lldb_init_module_4b5c9e92("__lldb_init_module()<br/><small>Flutter/ephemeral/flutter_lldb_helper.py</small>")
+    ephemeral_flutter_lldb_helper_rationale_8_2f0f39e9("Intercept NOTIFY_DEBUGGER_ABOUT_RX_PAGE...<br/><small>Flutter/ephemeral/flutter_lldb_helper.py</small>")
+    ios_flutter_ephemeral_flutter_lldb_helper_py_f9b4567b -->|contains| ephemeral_flutter_lldb_helper_handle_new_rx_page_1ba1facc
+    ios_flutter_ephemeral_flutter_lldb_helper_py_f9b4567b -->|contains| ephemeral_flutter_lldb_helper_lldb_init_module_4b5c9e92
+    ephemeral_flutter_lldb_helper_handle_new_rx_page_1ba1facc -->|explains| ephemeral_flutter_lldb_helper_rationale_8_2f0f39e9
+    class ios_flutter_ephemeral_flutter_lldb_helper_py_f9b4567b module;
+    class ephemeral_flutter_lldb_helper_handle_new_rx_page_1ba1facc function;
+    class ephemeral_flutter_lldb_helper_lldb_init_module_4b5c9e92 function;
+    class ephemeral_flutter_lldb_helper_rationale_8_2f0f39e9 concept;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>flutter_lldb_helper.py</code><br><small style="color:var(--muted)">Flutter/ephemeral/flutter_lldb_helper.py</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in Flutter/ephemeral/flutter_lldb_helper.py.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>handle_new_rx_page()</code><br><small style="color:var(--muted)">Flutter/ephemeral/flutter_lldb_helper.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>__lldb_init_module()</code><br><small style="color:var(--muted)">Flutter/ephemeral/flutter_lldb_helper.py</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>__lldb_init_module() node in Flutter/ephemeral/flutter_lldb_helper.py.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>Intercept NOTIFY_DEBUGGER_ABOUT_RX_PAGES and touch the pages.</code><br><small style="color:var(--muted)">Flutter/ephemeral/flutter_lldb_helper.py</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Design note for Intercept NOTIFY_DEBUGGER_ABOUT_RX_PAGES and touch the pages..</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>Flutter/ephemeral/flutter_lldb_helper.py</code></td><td>4 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x2, explains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 13. Scenedelegateswift Ios Runner ====== -->
+<h2 id="scenedelegateswift-ios-runner">13. Scenedelegateswift Ios Runner</h2>
+<p>Scenedelegateswift Ios Runner groups implementation around scenedelegateswift, ios, runner, scenedelegate, mostly in ios/Runner/SceneDelegate.swift. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Scenedelegateswift Ios Runner (3 nodes, 2 edges)
+    subgraph scenedelegateswift_ios_runner_ios_Runner_SceneDe_e376a5c6["ios/Runner/SceneDelegate.swift"]
+        ios_runner_scenedelegate_swift_ef889624("SceneDelegate.swift")
+        runner_scenedelegate_scenedelegate_fa48945e("SceneDelegate<br/><small>ios/Runner/SceneDelegate.swift</small>")
+    end
+    flutterscenedelegate_edfa84e6("FlutterSceneDelegate")
+    runner_scenedelegate_scenedelegate_fa48945e -->|inherits| flutterscenedelegate_edfa84e6
+    ios_runner_scenedelegate_swift_ef889624 -->|contains| runner_scenedelegate_scenedelegate_fa48945e
+    class ios_runner_scenedelegate_swift_ef889624 klass;
+    class runner_scenedelegate_scenedelegate_fa48945e klass;
+    class flutterscenedelegate_edfa84e6 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>SceneDelegate.swift</code><br><small style="color:var(--muted)">ios/Runner/SceneDelegate.swift</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SceneDelegate.swift node in ios/Runner/SceneDelegate.swift.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>SceneDelegate</code><br><small style="color:var(--muted)">ios/Runner/SceneDelegate.swift</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>SceneDelegate node in ios/Runner/SceneDelegate.swift.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>FlutterSceneDelegate</code><br><small style="color:var(--muted)"></small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>FlutterSceneDelegate node in project.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>ios/Runner/SceneDelegate.swift</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1, inherits x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 14. Flutter Linux Cmakeliststxt ====== -->
+<h2 id="flutter-linux-cmakeliststxt">14. Flutter Linux Cmakeliststxt</h2>
+<p>Flutter Linux Cmakeliststxt groups implementation around flutter, linux, cmakeliststxt, runner, mostly in linux/flutter/CMakeLists.txt, linux/runner/CMakeLists.txt. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Flutter Linux Cmakeliststxt (3 nodes, 2 edges)
+    subgraph flutter_linux_cmakeliststxt_linux_flutter_CMakeL_425a1d25["linux/flutter/CMakeLists.txt"]
+        linux_flutter_cmakelists_txt_flutter_a7142d59("flutter<br/><small>linux/flutter/CMakeLists.txt</small>")
+        linux_flutter_cmakelists_txt_flutter_assemble_a4627841("flutter_assemble<br/><small>linux/flutter/CMakeLists.txt</small>")
+    end
+    linux_runner_cmakelists_txt_runner_fe403328("runner<br/><small>linux/runner/CMakeLists.txt</small>")
+    linux_flutter_cmakelists_txt_flutter_a7142d59 -->|calls| linux_runner_cmakelists_txt_runner_fe403328
+    class linux_flutter_cmakelists_txt_flutter_a7142d59 function;
+    class linux_flutter_cmakelists_txt_flutter_assemble_a4627841 async;
+    class linux_runner_cmakelists_txt_runner_fe403328 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>flutter_assemble</code><br><small style="color:var(--muted)">linux/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-async">Async</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>flutter_assemble node in linux/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">linux/flutter/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>runner</code><br><small style="color:var(--muted)">linux/runner/CMakeLists.txt</small></td>
+  <td>flutter node in linux/flutter/CMakeLists.txt.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>runner</code><br><small style="color:var(--muted)">linux/runner/CMakeLists.txt</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>flutter</code><br><small style="color:var(--muted)">linux/flutter/CMakeLists.txt</small></td>
+  <td>No direct outbound edge</td>
+  <td>runner node in linux/runner/CMakeLists.txt.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>linux/flutter/CMakeLists.txt</code></td><td>2 nodes</td></tr>
+<tr><td><code>linux/runner/CMakeLists.txt</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: references x1, calls x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 15. Ios App Icon ====== -->
+<h2 id="ios-app-icon">15. Ios App Icon</h2>
+<p>Ios App Icon groups implementation around ios, app, icon, runner, mostly in Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png, Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Ios App Icon (2 nodes, 1 edges)
+    ios_runner_assets_xcassets_appicon_appiconset_ic_53cd5383("iOS App Icon (1024x1024)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_af6ed44a("iOS App Icon (20x20 @1x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_53cd5383 -->|semantically similar to| ios_runner_assets_xcassets_appicon_appiconset_ic_af6ed44a
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_53cd5383 function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_af6ed44a function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>iOS App Icon (1024x1024)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (1024x1024) node in Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>iOS App Icon (20x20 @1x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (20x20 @1x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png</code></td><td>1 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: semantically similar to x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 16. Other ====== -->
+<h2 id="other">16. Other</h2>
+<p>Other groups implementation around icon, app, ios, runner, mostly in analysis_options.yaml, pubspec.yaml, web/icons/Icon-192.png. This section covers 24 nodes and 3 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Other (24 nodes, 3 edges)
+    ios_runner_assets_xcassets_appicon_appiconset_ic_8a0e9b86("iOS App Icon (29x29 @1x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_963808b6("iOS App Icon (29x29 @2x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_7f33bd18("iOS App Icon (29x29 @3x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_093df41f("iOS App Icon (40x40 @1x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_11a5dd5f("iOS App Icon (60x60 @2x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_3d46cc60("iOS App Icon (76x76 @1x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_84c0dc8a("iOS App Icon (76x76 @2x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png</small>")
+    ios_runner_assets_xcassets_appicon_appiconset_ic_8527693c("iOS App Icon (83.5x83.5 @2x)<br/><small>Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png</small>")
+    macos_runner_assets_xcassets_appicon_appiconset_a73f0d55("macOS App Icon (16)<br/><small>Assets.xcassets/AppIcon.appiconset/app_icon_16.png</small>")
+    macos_runner_assets_xcassets_appicon_appiconset_3832b1f9("macOS App Icon (32)<br/><small>Assets.xcassets/AppIcon.appiconset/app_icon_32.png</small>")
+    macos_runner_assets_xcassets_appicon_appiconset_58429168("macOS App Icon (512)<br/><small>Assets.xcassets/AppIcon.appiconset/app_icon_512.png</small>")
+    ios_runner_assets_xcassets_launchimage_imageset_b8700b10("iOS Launch Image<br/><small>Assets.xcassets/LaunchImage.imageset/LaunchImage.png</small>")
+    analysis_options_yaml_a5979708("Analysis Options<br/><small>analysis_options.yaml</small>")
+    pubspec_flutter_lints_e8a82dca("flutter_lints<br/><small>pubspec.yaml</small>")
+    web_icons_icon_192_7f8ed95f("Web Icon (192)<br/><small>web/icons/Icon-192.png</small>")
+    web_icons_icon_512_b3135425("Web Icon (512)<br/><small>web/icons/Icon-512.png</small>")
+    web_icons_icon_maskable_192_46a0cebc("Web Maskable Icon (192)<br/><small>web/icons/Icon-maskable-192.png</small>")
+    web_icons_icon_maskable_512_7b79a220("Web Maskable Icon (512)<br/><small>web/icons/Icon-maskable-512.png</small>")
+    analysis_options_yaml_a5979708 -->|references| pubspec_flutter_lints_e8a82dca
+    web_icons_icon_192_7f8ed95f -->|semantically similar to| web_icons_icon_512_b3135425
+    web_icons_icon_maskable_192_46a0cebc -->|semantically similar to| web_icons_icon_maskable_512_7b79a220
+    %% Omitted for readability: 6 nodes, 0 edges
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_8a0e9b86 function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_963808b6 function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_7f33bd18 function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_093df41f function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_11a5dd5f function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_3d46cc60 function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_84c0dc8a function;
+    class ios_runner_assets_xcassets_appicon_appiconset_ic_8527693c function;
+    class macos_runner_assets_xcassets_appicon_appiconset_a73f0d55 function;
+    class macos_runner_assets_xcassets_appicon_appiconset_3832b1f9 function;
+    class macos_runner_assets_xcassets_appicon_appiconset_58429168 function;
+    class ios_runner_assets_xcassets_launchimage_imageset_b8700b10 function;
+    class analysis_options_yaml_a5979708 klass;
+    class pubspec_flutter_lints_e8a82dca test;
+    class web_icons_icon_192_7f8ed95f klass;
+    class web_icons_icon_512_b3135425 klass;
+    class web_icons_icon_maskable_192_46a0cebc klass;
+    class web_icons_icon_maskable_512_7b79a220 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>Analysis Options</code><br><small style="color:var(--muted)">analysis_options.yaml</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Orchestrates analysis and returns structured documentation data.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>flutter_lints</code><br><small style="color:var(--muted)">pubspec.yaml</small></td>
+  <td><span class="tag tag-func">Test</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>flutter_lints node in pubspec.yaml.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>Web Icon (192)</code><br><small style="color:var(--muted)">web/icons/Icon-192.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Web Icon (192) node in web/icons/Icon-192.png.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>Web Icon (512)</code><br><small style="color:var(--muted)">web/icons/Icon-512.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Web Icon (512) node in web/icons/Icon-512.png.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>Web Maskable Icon (192)</code><br><small style="color:var(--muted)">web/icons/Icon-maskable-192.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Web Maskable Icon (192) node in web/icons/Icon-maskable-192.png.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>Web Maskable Icon (512)</code><br><small style="color:var(--muted)">web/icons/Icon-maskable-512.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Web Maskable Icon (512) node in web/icons/Icon-maskable-512.png.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>settings.gradle.kts</code><br><small style="color:var(--muted)">android/settings.gradle.kts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>settings.gradle.kts node in android/settings.gradle.kts.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>MainActivity</code><br><small style="color:var(--muted)">smartai/smartai_chat/MainActivity.kt</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MainActivity node in smartai/smartai_chat/MainActivity.kt.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Runner-Bridging-Header.h</code><br><small style="color:var(--muted)">ios/Runner/Runner-Bridging-Header.h</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Runner-Bridging-Header.h node in ios/Runner/Runner-Bridging-Header.h.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Launch Screen Assets</code><br><small style="color:var(--muted)">Assets.xcassets/LaunchImage.imageset/README.md</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Documentation node describing Launch Screen Assets.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>Android Launcher Icon (HDPI)</code><br><small style="color:var(--muted)">res/mipmap-hdpi/ic_launcher.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Android Launcher Icon (HDPI) node in res/mipmap-hdpi/ic_launcher.png.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>iOS App Icon (29x29 @1x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (29x29 @1x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>iOS App Icon (29x29 @2x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (29x29 @2x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>iOS App Icon (29x29 @3x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (29x29 @3x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>iOS App Icon (40x40 @1x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (40x40 @1x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>iOS App Icon (60x60 @2x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (60x60 @2x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>iOS App Icon (76x76 @1x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (76x76 @1x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>iOS App Icon (76x76 @2x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (76x76 @2x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>iOS App Icon (83.5x83.5 @2x)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS App Icon (83.5x83.5 @2x) node in Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>iOS Launch Image</code><br><small style="color:var(--muted)">Assets.xcassets/LaunchImage.imageset/LaunchImage.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>iOS Launch Image node in Assets.xcassets/LaunchImage.imageset/LaunchImage.png.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>macOS App Icon (16)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/app_icon_16.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>macOS App Icon (16) node in Assets.xcassets/AppIcon.appiconset/app_icon_16.png.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>macOS App Icon (32)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/app_icon_32.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>macOS App Icon (32) node in Assets.xcassets/AppIcon.appiconset/app_icon_32.png.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>macOS App Icon (512)</code><br><small style="color:var(--muted)">Assets.xcassets/AppIcon.appiconset/app_icon_512.png</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>macOS App Icon (512) node in Assets.xcassets/AppIcon.appiconset/app_icon_512.png.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>Web Favicon</code><br><small style="color:var(--muted)">web/favicon.png</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Web Favicon node in web/favicon.png.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>analysis_options.yaml</code></td><td>1 nodes</td></tr>
+<tr><td><code>smartai/smartai_chat/MainActivity.kt</code></td><td>1 nodes</td></tr>
+<tr><td><code>res/mipmap-hdpi/ic_launcher.png</code></td><td>1 nodes</td></tr>
+<tr><td><code>android/settings.gradle.kts</code></td><td>1 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png</code></td><td>1 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png</code></td><td>1 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png</code></td><td>1 nodes</td></tr>
+<tr><td><code>Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: semantically similar to x2, references x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>206</td></tr>
+      <tr><td>Edges</td><td>219</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>42</td></tr>
+      <tr><td>Documented Sections</td><td>15</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>201</td></tr>
+      <tr><td>INFERRED</td><td>18</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>smartai_chat — Architecture Documentation</p>
+  <p>Generated: 2026-05-24 00:19 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>

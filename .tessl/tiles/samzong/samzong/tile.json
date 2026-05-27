@@ -1,0 +1,30 @@
+{
+  "name": "samzong/samzong",
+  "version": "8932c2ed7924f790a90c163192d52f4e82468ab4",
+  "summary": "Auto-generated tile from GitHub (16 skills)",
+  "private": true,
+  "skills": {
+    "codewiki-generator": {
+      "path": "skills/codewiki-generator/SKILL.md"
+    }
+  },
+  "excludes": {
+    "skills": [
+      "bugfix-dispatch",
+      "clig-eval-prompt",
+      "coding-global-memory",
+      "critical-bug-finder",
+      "gh-pr-review",
+      "gmc",
+      "handoff",
+      "issue-cleaner-master",
+      "nobs-review",
+      "pre-ship",
+      "repo-skill-generator",
+      "ship",
+      "simplify",
+      "vibe-calibrate",
+      "wechat-tech-article"
+    ]
+  }
+}

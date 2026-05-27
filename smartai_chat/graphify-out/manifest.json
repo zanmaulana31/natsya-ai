@@ -1,0 +1,257 @@
+{
+  "D:\\projects\\smartai\\smartai_chat\\android\\build.gradle.kts": {
+    "mtime": 1779541259.9827561,
+    "ast_hash": "803fe22651fbe96ed401eb0b66a492d1",
+    "semantic_hash": "803fe22651fbe96ed401eb0b66a492d1"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\android\\gradlew": {
+    "mtime": 1779541263.41696,
+    "ast_hash": "7f1cd7eb3f75a1dc85cd37753972a6e2",
+    "semantic_hash": "7f1cd7eb3f75a1dc85cd37753972a6e2"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\android\\settings.gradle.kts": {
+    "mtime": 1779541260.5339544,
+    "ast_hash": "f276a44edd917afd836899357fdae60e",
+    "semantic_hash": "f276a44edd917afd836899357fdae60e"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\android\\app\\build.gradle.kts": {
+    "mtime": 1779541259.9036489,
+    "ast_hash": "e6eb0851c48ecca273b48878107f04d6",
+    "semantic_hash": "e6eb0851c48ecca273b48878107f04d6"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\android\\app\\src\\main\\java\\io\\flutter\\plugins\\GeneratedPluginRegistrant.java": {
+    "mtime": 1779541270.072036,
+    "ast_hash": "5b3b418ce50367c33bded3c0df06d47f",
+    "semantic_hash": "5b3b418ce50367c33bded3c0df06d47f"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\android\\app\\src\\main\\kotlin\\com\\smartai\\smartai_chat\\MainActivity.kt": {
+    "mtime": 1779541259.9183795,
+    "ast_hash": "7c43aad7a319a597f4751828aba91a5d",
+    "semantic_hash": "7c43aad7a319a597f4751828aba91a5d"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Flutter\\flutter_export_environment.sh": {
+    "mtime": 1779541269.9830046,
+    "ast_hash": "4ab28b813cbc47ea1d3453fb56e2c210",
+    "semantic_hash": "4ab28b813cbc47ea1d3453fb56e2c210"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Flutter\\ephemeral\\flutter_lldb_helper.py": {
+    "mtime": 1779541269.9768424,
+    "ast_hash": "98fc75412162af387e2e3461e4e58094",
+    "semantic_hash": "98fc75412162af387e2e3461e4e58094"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\AppDelegate.swift": {
+    "mtime": 1776772922.9192493,
+    "ast_hash": "9e1de9c329a3fe4931876063de95132b",
+    "semantic_hash": "9e1de9c329a3fe4931876063de95132b"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\GeneratedPluginRegistrant.h": {
+    "mtime": 1779541270.0860422,
+    "ast_hash": "decb9041b5e91a07e66f4664e5dac408",
+    "semantic_hash": "decb9041b5e91a07e66f4664e5dac408"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\GeneratedPluginRegistrant.m": {
+    "mtime": 1779541270.0870664,
+    "ast_hash": "f6079b630997f8fd4ae1ac639162419a",
+    "semantic_hash": "f6079b630997f8fd4ae1ac639162419a"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\Runner-Bridging-Header.h": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "7ad7b5cea096132de13ba526b2b9efbe",
+    "semantic_hash": "7ad7b5cea096132de13ba526b2b9efbe"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\SceneDelegate.swift": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "0c3e86af131f6a9e547c80b5ed058914",
+    "semantic_hash": "0c3e86af131f6a9e547c80b5ed058914"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Contents.json": {
+    "mtime": 1776772922.9192493,
+    "ast_hash": "31a08e429403e265cabfb31b3d65f049",
+    "semantic_hash": "31a08e429403e265cabfb31b3d65f049"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\Contents.json": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "b9e927ac17345f2d5f052fe68a3487f9",
+    "semantic_hash": "b9e927ac17345f2d5f052fe68a3487f9"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\ios\\RunnerTests\\RunnerTests.swift": {
+    "mtime": 1779541261.106726,
+    "ast_hash": "24e5d095048eb86c30423f4e04b6e57b",
+    "semantic_hash": "24e5d095048eb86c30423f4e04b6e57b"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\main.dart": {
+    "mtime": 1779541462.3018966,
+    "ast_hash": "ded712de05c21f1a1ade984593d678f8",
+    "semantic_hash": "ded712de05c21f1a1ade984593d678f8"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\mock\\mock_data.dart": {
+    "mtime": 1779541616.0503156,
+    "ast_hash": "1d24f38dd02c05257f1ceb1cdf844695",
+    "semantic_hash": "1d24f38dd02c05257f1ceb1cdf844695"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\models\\message.dart": {
+    "mtime": 1779541347.3580165,
+    "ast_hash": "470baad93865ea8c0e84e58589cbb021",
+    "semantic_hash": "470baad93865ea8c0e84e58589cbb021"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\providers\\chat_provider.dart": {
+    "mtime": 1779541451.3225732,
+    "ast_hash": "db3b04dd604d8ae3f45a4f0884409ce9",
+    "semantic_hash": "db3b04dd604d8ae3f45a4f0884409ce9"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\providers\\theme_provider.dart": {
+    "mtime": 1779541452.1404946,
+    "ast_hash": "dc451097fb1c931afd346c4962811bb5",
+    "semantic_hash": "dc451097fb1c931afd346c4962811bb5"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\screens\\chat_screen.dart": {
+    "mtime": 1779541519.326856,
+    "ast_hash": "5efc54523b8d68ca5993a4b34a6f6f4e",
+    "semantic_hash": "5efc54523b8d68ca5993a4b34a6f6f4e"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\widgets\\message_bubble.dart": {
+    "mtime": 1779541364.3343854,
+    "ast_hash": "c73fa3dd6ac2ca0d15ee75aa755a6cf2",
+    "semantic_hash": "c73fa3dd6ac2ca0d15ee75aa755a6cf2"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\lib\\widgets\\message_input.dart": {
+    "mtime": 1779541506.9011736,
+    "ast_hash": "281c45c42136ca817151c9ba0eb6b3c4",
+    "semantic_hash": "281c45c42136ca817151c9ba0eb6b3c4"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\linux\\flutter\\generated_plugin_registrant.cc": {
+    "mtime": 1779541270.076152,
+    "ast_hash": "d07afe003d5837167bdd357d593f20a0",
+    "semantic_hash": "d07afe003d5837167bdd357d593f20a0"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\linux\\flutter\\generated_plugin_registrant.h": {
+    "mtime": 1779541270.0751543,
+    "ast_hash": "d295462c9da9f7fef22dc86c34492318",
+    "semantic_hash": "d295462c9da9f7fef22dc86c34492318"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\linux\\runner\\main.cc": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "539395bcd63dba20afed0838d136189f",
+    "semantic_hash": "539395bcd63dba20afed0838d136189f"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\linux\\runner\\my_application.cc": {
+    "mtime": 1779541261.4256778,
+    "ast_hash": "024c4743335d031bbac2e06821844fc6",
+    "semantic_hash": "024c4743335d031bbac2e06821844fc6"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\linux\\runner\\my_application.h": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "ffa1a7c0a2ad45a2c14a921596516ff8",
+    "semantic_hash": "ffa1a7c0a2ad45a2c14a921596516ff8"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\Flutter\\GeneratedPluginRegistrant.swift": {
+    "mtime": 1779541270.090237,
+    "ast_hash": "c840bc53b61279c2fb631741134c2ed7",
+    "semantic_hash": "c840bc53b61279c2fb631741134c2ed7"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\Flutter\\ephemeral\\flutter_export_environment.sh": {
+    "mtime": 1779541269.988672,
+    "ast_hash": "f873b7a6a8d05d4d0a550c9358998d35",
+    "semantic_hash": "f873b7a6a8d05d4d0a550c9358998d35"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\Runner\\AppDelegate.swift": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "4b52e0b89ebfef9baf45b04548c463d6",
+    "semantic_hash": "4b52e0b89ebfef9baf45b04548c463d6"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\Runner\\MainFlutterWindow.swift": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "93c22dae2d93f3dc1402e121901f582b",
+    "semantic_hash": "93c22dae2d93f3dc1402e121901f582b"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Contents.json": {
+    "mtime": 1776772922.934946,
+    "ast_hash": "1d48e925145d4b573a3b5d7960a1c585",
+    "semantic_hash": "1d48e925145d4b573a3b5d7960a1c585"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\macos\\RunnerTests\\RunnerTests.swift": {
+    "mtime": 1779541261.8583233,
+    "ast_hash": "8059f5d27a19c556eeafb49b3f9b7bdd",
+    "semantic_hash": "8059f5d27a19c556eeafb49b3f9b7bdd"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\test\\widget_test.dart": {
+    "mtime": 1779541564.883141,
+    "ast_hash": "7b00373a759b3b5004079c17a9fadf4b",
+    "semantic_hash": "7b00373a759b3b5004079c17a9fadf4b"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\test\\mock\\mock_data_test.dart": {
+    "mtime": 1779541584.1345313,
+    "ast_hash": "fe712c2ea91f5c8ac0d6e0c451ae55d6",
+    "semantic_hash": "fe712c2ea91f5c8ac0d6e0c451ae55d6"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\test\\models\\message_test.dart": {
+    "mtime": 1779541582.897886,
+    "ast_hash": "3e1e7bdc93f9b82ea1ca296a9fe72f01",
+    "semantic_hash": "3e1e7bdc93f9b82ea1ca296a9fe72f01"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\test\\providers\\chat_provider_test.dart": {
+    "mtime": 1779541587.290293,
+    "ast_hash": "788e4c0d3078f2f6e9567e338e7caaa0",
+    "semantic_hash": "788e4c0d3078f2f6e9567e338e7caaa0"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\test\\providers\\theme_provider_test.dart": {
+    "mtime": 1779541588.9059248,
+    "ast_hash": "95ebbda4e9f3da473fe52a1a6e34cbe5",
+    "semantic_hash": "95ebbda4e9f3da473fe52a1a6e34cbe5"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\web\\manifest.json": {
+    "mtime": 1779541262.7169092,
+    "ast_hash": "96ba88e73d02c336f233d82e251c6c88",
+    "semantic_hash": "96ba88e73d02c336f233d82e251c6c88"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\flutter\\generated_plugin_registrant.cc": {
+    "mtime": 1779541270.0816953,
+    "ast_hash": "a8f91348d8d9090f22ec69d597c41e1f",
+    "semantic_hash": "a8f91348d8d9090f22ec69d597c41e1f"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\flutter\\generated_plugin_registrant.h": {
+    "mtime": 1779541270.0806832,
+    "ast_hash": "0ea33875f9f8e118f9c2ded03e2e2835",
+    "semantic_hash": "0ea33875f9f8e118f9c2ded03e2e2835"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\flutter_window.cpp": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "2f463f9b7da67a2d692a012f9ea85e0c",
+    "semantic_hash": "2f463f9b7da67a2d692a012f9ea85e0c"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\flutter_window.h": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "7defcc89d4a26d56e801241d624d48fb",
+    "semantic_hash": "7defcc89d4a26d56e801241d624d48fb"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\main.cpp": {
+    "mtime": 1779541262.8308854,
+    "ast_hash": "25815cadf30c0af577b0f2d097c419db",
+    "semantic_hash": "25815cadf30c0af577b0f2d097c419db"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\resource.h": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "1ade5dd15e613479a15e8832ed276f2b",
+    "semantic_hash": "1ade5dd15e613479a15e8832ed276f2b"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\utils.cpp": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "432461b09d862a2f8dadf380ff0e34e5",
+    "semantic_hash": "432461b09d862a2f8dadf380ff0e34e5"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\utils.h": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "fd81e143f5614eb6fd75efe539002853",
+    "semantic_hash": "fd81e143f5614eb6fd75efe539002853"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\win32_window.cpp": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "571eb8234dbc2661be03aa5f2a4d2fca",
+    "semantic_hash": "571eb8234dbc2661be03aa5f2a4d2fca"
+  },
+  "D:\\projects\\smartai\\smartai_chat\\windows\\runner\\win32_window.h": {
+    "mtime": 1776772922.950734,
+    "ast_hash": "7569387d58711ab975940f4df3b4bcda",
+    "semantic_hash": "7569387d58711ab975940f4df3b4bcda"
+  }
+}

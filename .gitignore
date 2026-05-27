@@ -1,0 +1,17 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# CodeGraph (local machine index)
+.codegraph/
+
+# codewiki (VitePress)
+codewiki/node_modules/
+codewiki/.vitepress/dist/
+codewiki/.vitepress/cache/
+
+# Editor
+*.swp
+*.swo
+*~
