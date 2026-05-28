@@ -2,19 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 import '../models/message.dart';
+import 'error_bubble.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
   final bool isConsecutive;
+  final VoidCallback? onRetry;
 
   const MessageBubble({
     super.key,
     required this.message,
     this.isConsecutive = false,
+    this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (message.isError) {
+      return ErrorBubble(
+        message: message.text,
+        onRetry: onRetry ?? () {},
+      );
+    }
+
     final theme = context.theme;
     final isUser = message.sender == MessageSender.user;
     final colors = theme.colors;

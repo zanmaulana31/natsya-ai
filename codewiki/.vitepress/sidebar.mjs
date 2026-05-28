@@ -24,7 +24,12 @@ export default [
   {
     text: 'Development',
     items: [
-      { text: 'Panduan', link: '/development/overview' }
+      { text: 'Panduan', link: '/development/overview' },
+      { text: 'Template Model', link: '/development/model-template' },
+      { text: 'Template Mock Data', link: '/development/mock-data-template' },
+      { text: 'Template Service', link: '/development/service-template' },
+      { text: 'Template Provider', link: '/development/provider-template' },
+      { text: 'Template Test Provider', link: '/development/provider-test-template' }
     ]
   }
 ]

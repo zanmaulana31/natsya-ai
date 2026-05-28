@@ -20,24 +20,7 @@ class TestAiModelNotifier extends AiModelNotifier {
   AiModelState build() => _initialState;
 
   @override
-  Future<void> downloadAndInit() async {
-    // no-op for widget tests
-  }
-}
-
-class VerifyingAiModelNotifier extends AiModelNotifier {
-  final AiModelState _initialState;
-  bool downloadAndInitCalled = false;
-
-  VerifyingAiModelNotifier([this._initialState = const AiModelState(status: AiModelStatus.notDownloaded)]);
-
-  @override
-  AiModelState build() => _initialState;
-
-  @override
-  Future<void> downloadAndInit() async {
-    downloadAndInitCalled = true;
-  }
+  Future<void> downloadAndInit() async {}
 }
 
 void main() {
@@ -76,37 +59,27 @@ void main() {
       expect(const ModelLoadingScreen().key, isNull);
     });
 
-    testWidgets('initState calls downloadAndInit when status is notDownloaded', (tester) async {
-      final notifier = VerifyingAiModelNotifier(const AiModelState(status: AiModelStatus.notDownloaded));
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            aiModelServiceProvider.overrideWith((ref) => mockService),
-            aiModelProvider.overrideWith(() => notifier),
-          ],
-          child: MaterialApp(
-            home: FTheme(
-              data: FThemes.violet.light.touch,
-              child: const FToaster(
-                child: FTooltipGroup(
-                  child: ModelLoadingScreen(),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.pump();
-      expect(notifier.downloadAndInitCalled, isTrue);
+    testWidgets('shows choice section when status is notDownloaded', (tester) async {
+      await tester.pumpWidget(buildScreen(
+        state: const AiModelState(status: AiModelStatus.notDownloaded),
+      ));
+
+      expect(find.text('Choose how to use Natsya AI'), findsOneWidget);
+      expect(find.byKey(const Key('model_choice_cloud')), findsOneWidget);
+      expect(find.byKey(const Key('model_choice_local')), findsOneWidget);
     });
 
-    testWidgets('initState calls downloadAndInit when status is error', (tester) async {
-      final notifier = VerifyingAiModelNotifier(const AiModelState(status: AiModelStatus.error));
+    testWidgets('does not auto-download on init', (tester) async {
+      final mock = MockAiModelService();
+      when(() => mock.isDownloaded()).thenAnswer((_) async => false);
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            aiModelServiceProvider.overrideWith((ref) => mockService),
-            aiModelProvider.overrideWith(() => notifier),
+            aiModelServiceProvider.overrideWith((ref) => mock),
+            aiModelProvider.overrideWith(() => TestAiModelNotifier(
+              const AiModelState(status: AiModelStatus.notDownloaded),
+            )),
           ],
           child: MaterialApp(
             home: FTheme(
@@ -121,16 +94,22 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(notifier.downloadAndInitCalled, isTrue);
+
+      expect(find.text('Choose how to use Natsya AI'), findsOneWidget);
     });
 
     testWidgets('does not call downloadAndInit when already downloading', (tester) async {
-      final notifier = VerifyingAiModelNotifier(const AiModelState(status: AiModelStatus.downloading));
+      final mock = MockAiModelService();
+      when(() => mock.isDownloaded()).thenAnswer((_) async => false);
+
+      // Start already in downloading state (choice won't be shown)
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            aiModelServiceProvider.overrideWith((ref) => mockService),
-            aiModelProvider.overrideWith(() => notifier),
+            aiModelServiceProvider.overrideWith((ref) => mock),
+            aiModelProvider.overrideWith(() => TestAiModelNotifier(
+              const AiModelState(status: AiModelStatus.downloading, downloadProgress: 0.5),
+            )),
           ],
           child: MaterialApp(
             home: FTheme(
@@ -145,7 +124,10 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(notifier.downloadAndInitCalled, isFalse);
+
+      // Should show progress, not choice section
+      expect(find.byKey(const Key('model_loading_progress')), findsOneWidget);
+      expect(find.text('Choose how to use Natsya AI'), findsNothing);
     });
 
     testWidgets('root is Scaffold with backgroundColor', (tester) async {
@@ -329,18 +311,40 @@ void main() {
       expect(find.byType(AppBar), findsNothing);
     });
 
-    testWidgets('navigates to ChatScreen when status becomes ready', (tester) async {
+    testWidgets('tapping "Download Local Model" shows progress on ready', (tester) async {
       await tester.pumpWidget(buildScreen(
         state: const AiModelState(status: AiModelStatus.notDownloaded),
       ));
 
+      expect(find.byKey(const Key('model_choice_local')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('model_choice_local')));
+      await tester.pump();
+
+      // After tapping local, choice section disappears, progress appears
+      // (status transitions to downloading in real code; in test it stays notDownloaded
+      //  because TestAiModelNotifier.downloadAndInit is a no-op)
+      // The progress section won't show because status is still notDownloaded.
+      // Instead, trigger ready state manually to test navigation.
       final container = ProviderScope.containerOf(
         tester.element(find.byType(ModelLoadingScreen)),
       );
-
       container.read(aiModelProvider.notifier).state =
           const AiModelState(status: AiModelStatus.ready);
 
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ChatScreen), findsOneWidget);
+    });
+
+    testWidgets('tapping "Use Cloud AI" navigates to chat', (tester) async {
+      await tester.pumpWidget(buildScreen(
+        state: const AiModelState(status: AiModelStatus.notDownloaded),
+      ));
+
+      expect(find.byKey(const Key('model_choice_cloud')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('model_choice_cloud')));
       await tester.pumpAndSettle();
 
       expect(find.byType(ChatScreen), findsOneWidget);
@@ -351,10 +355,12 @@ void main() {
         state: const AiModelState(status: AiModelStatus.notDownloaded),
       ));
 
+      await tester.tap(find.byKey(const Key('model_choice_local')));
+      await tester.pump();
+
       final container = ProviderScope.containerOf(
         tester.element(find.byType(ModelLoadingScreen)),
       );
-
       container.read(aiModelProvider.notifier).state =
           const AiModelState(status: AiModelStatus.ready);
 

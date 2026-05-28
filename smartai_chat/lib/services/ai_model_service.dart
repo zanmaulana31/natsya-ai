@@ -5,7 +5,10 @@ import 'package:cactus/cactus.dart';
 
 import '../models/ai_model_status.dart';
 
-/// Encapsulates all Cactus LM operations for the LFM2.5 1.2B Thinking model.
+/// Model slug for the Cactus LFM 2 350M model (smaller, for compatibility).
+const String _modelSlug = 'lfm2-350m';
+
+/// Encapsulates all Cactus LM operations for the LFM 2 350M model.
 class AiModelService {
   CactusLM? _lm;
   AiModelStatus _status = AiModelStatus.notDownloaded;
@@ -16,7 +19,7 @@ class AiModelService {
 
   AiModelService({CactusLM? lm}) : _lm = lm;
 
-  /// Downloads the LFM2.5 1.2B Thinking model.
+  /// Downloads the LFM 2 350M model.
   ///
   /// Retries once on transient network errors.
   Future<void> downloadModel({void Function(double progress)? onProgress}) async {
@@ -27,7 +30,7 @@ class AiModelService {
       final lm = _lm ?? CactusLM();
       _lm = lm;
       await lm.downloadModel(
-        model: 'lfm2.5-1.2b-thinking',
+        model: _modelSlug,
         downloadProcessCallback: (progress, status, isError) {
           if (progress != null) {
             onProgress?.call(progress);
@@ -40,7 +43,6 @@ class AiModelService {
       await doDownload();
       _status = AiModelStatus.downloaded;
     } on SocketException catch (_) {
-      // Retry once on network errors
       try {
         await doDownload();
         _status = AiModelStatus.downloaded;
@@ -49,7 +51,6 @@ class AiModelService {
         _errorMessage = 'Model download failed: $e';
       }
     } on TimeoutException catch (_) {
-      // Retry once on timeout
       try {
         await doDownload();
         _status = AiModelStatus.downloaded;
@@ -75,7 +76,7 @@ class AiModelService {
     try {
       await _lm!.initializeModel(
         params: CactusInitParams(
-          model: 'lfm2.5-1.2b-thinking',
+          model: _modelSlug,
           contextSize: 2048,
         ),
       );
@@ -114,13 +115,13 @@ class AiModelService {
     );
   }
 
-  /// Fetches metadata for the LFM2.5 1.2B Thinking model.
+  /// Fetches metadata for the LFM 2 350M model.
   Future<CactusModel?> getModelInfo() async {
     final lm = _lm ?? CactusLM();
     _lm ??= lm;
     final models = await lm.getModels();
     for (final model in models) {
-      if (model.slug == 'lfm2.5-1.2b-thinking') return model;
+      if (model.slug == _modelSlug) return model;
     }
     return null;
   }

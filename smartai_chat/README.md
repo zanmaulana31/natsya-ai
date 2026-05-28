@@ -49,6 +49,50 @@ flutter run -d android      # Android (emulator/device)
 flutter run -d ios          # iOS (simulator/device)
 ```
 
+### Supabase Anon Key (wajib untuk autentikasi)
+
+Untuk menggunakan fitur login Google OAuth, set **Supabase anon key** saat run:
+
+```bash
+flutter run --dart-define=SUPABASE_ANON_KEY=your_supabase_anon_key_here
+```
+
+Anon key didapatkan dari Supabase Dashboard → Project Settings → API → `anon public` key. **Jangan** gunakan Service Role Key di client-side.
+
+### Cloud API Key (optional)
+
+Untuk menggunakan cloud AI sebagai fallback (saat on-device model bermasalah), set API key saat run:
+
+```bash
+flutter run --dart-define=CLOUD_API_KEY=your_api_key_here
+```
+
+Dapatkan API key gratis di [platform.publicai.co](https://platform.publicai.co) (PublicAI — nonprofit, open-source, tidak perlu kartu kredit).
+
+Providers yang didukung: **PublicAI** (default), **Groq**, **OpenRouter**, **DeepSeek** — atau API OpenAI-compatible lainnya. Konfigurasi via `CloudAiConfig`.
+
+### Multiple Dart Define
+
+Anda bisa menambahkan `--dart-define` berkali-kali dalam satu command:
+
+```bash
+flutter run \
+  --dart-define=SUPABASE_ANON_KEY=eyJhbG... \
+  --dart-define=CLOUD_API_KEY=your_api_key_here
+```
+
+Satu baris:
+```bash
+flutter run --dart-define=SUPABASE_ANON_KEY=eyJhbG... --dart-define=CLOUD_API_KEY=your_api_key_here
+```
+
+Untuk build release:
+```bash
+flutter build apk --release \
+  --dart-define=SUPABASE_ANON_KEY=eyJhbG... \
+  --dart-define=CLOUD_API_KEY=your_api_key_here
+```
+
 ## Run Unit Tests
 
 ```bash

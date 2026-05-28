@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 
+import '../models/message.dart';
 import '../providers/chat_provider.dart';
 import '../providers/sidebar_provider.dart';
 import '../providers/theme_provider.dart';
@@ -9,6 +10,7 @@ import '../widgets/message_bubble.dart';
 import '../widgets/message_input.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/sidebar_toggle_button.dart';
+import '../widgets/typing_indicator.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -59,15 +61,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(chatProvider);
+    final chatState = ref.watch(chatProvider);
+    final messages = chatState.messages;
+    final isGenerating = chatState.isGenerating;
     final themeMode = ref.watch(themeProvider);
     final isSidebarOpen = ref.watch(sidebarProvider);
 
     ref.listen(chatProvider, (prev, next) {
-      if (_isNearBottom && prev != null && next.length > prev.length) {
+      if (_isNearBottom && prev != null && next.messages.length > prev.messages.length) {
         _scrollToBottom();
       }
     });
+
+    final showTypingIndicator = isGenerating &&
+        (messages.isEmpty || messages.last.sender != MessageSender.ai);
 
     return Stack(
       children: [
@@ -91,8 +98,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: messages.length,
+                  itemCount: messages.length + (showTypingIndicator ? 1 : 0),
                   itemBuilder: (context, index) {
+                    if (index == messages.length) {
+                      return const TypingIndicator();
+                    }
+
                     final message = messages[index];
                     final isConsecutive = index > 0 &&
                         messages[index - 1].sender == message.sender;
@@ -100,11 +111,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     return MessageBubble(
                       message: message,
                       isConsecutive: isConsecutive,
+                      onRetry: message.isError
+                          ? () => ref.read(chatProvider.notifier).retry()
+                          : null,
                     );
                   },
                 ),
               ),
-              const MessageInput(),
+              MessageInput(
+                isGenerating: isGenerating,
+                onCancel: () => ref.read(chatProvider.notifier).cancelGeneration(),
+              ),
             ],
           ),
         ),

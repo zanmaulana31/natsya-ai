@@ -7,6 +7,16 @@
 - `test/`
 ```
 
+## Template Development
+
+| Template | File | Kapan Dipakai |
+|---|---|---|
+| Model | [model-template.md](/development/model-template) | Bikin struktur data |
+| Mock Data | [mock-data-template.md](/development/mock-data-template) | Bikin data palsu |
+| Service | [service-template.md](/development/service-template) | Bikin layer I/O (API, DB, dll) |
+| Provider | [provider-template.md](/development/provider-template) | Bikin state management |
+| Test Provider | [provider-test-template.md](/development/provider-test-template) | Unit test provider |
+
 ## Workflow Lokal
 
 ```bash

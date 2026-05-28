@@ -270,12 +270,12 @@ void main() {
         final models = [
           CactusModel(
             createdAt: DateTime.now(),
-            slug: 'lfm2.5-1.2b-thinking',
+            slug: 'lfm2-1.2b',
             downloadUrl: 'http://example.com',
             sizeMb: 100,
             supportsToolCalling: true,
             supportsVision: false,
-            name: 'LFM2.5 1.2B Thinking',
+            name: 'LFM 2 1.2B',
             isDownloaded: true,
           ),
         ];
@@ -285,7 +285,7 @@ void main() {
         final info = await service.getModelInfo();
 
         expect(info, isNotNull);
-        expect(info!.slug, 'lfm2.5-1.2b-thinking');
+        expect(info!.slug, 'lfm2-1.2b');
       });
 
       test('returns null when model not found', () async {
@@ -302,12 +302,12 @@ void main() {
         final models = [
           CactusModel(
             createdAt: DateTime.now(),
-            slug: 'lfm2.5-1.2b-thinking',
+            slug: 'lfm2-1.2b',
             downloadUrl: 'http://example.com',
             sizeMb: 100,
             supportsToolCalling: true,
             supportsVision: false,
-            name: 'LFM2.5 1.2B Thinking',
+            name: 'LFM 2 1.2B',
             isDownloaded: true,
           ),
         ];

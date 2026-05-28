@@ -37,7 +37,7 @@ void main() {
 
     setUpAll(() {
       final file = File('lib/services/notification_service.dart');
-      source = file.readAsStringSync();
+      source = file.readAsStringSync().replaceAll('\r\n', '\n');
     });
 
     test('exports NotificationService class', () {

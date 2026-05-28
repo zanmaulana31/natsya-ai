@@ -4,10 +4,9 @@ import 'package:forui/forui.dart';
 
 import '../models/ai_model_status.dart';
 import '../providers/ai_model_provider.dart';
+import '../providers/cloud_ai_provider.dart';
 import '../screens/chat_screen.dart';
 
-/// Blocking launch screen that shows branded progress while the AI model
-/// downloads and initializes in the background.
 class ModelLoadingScreen extends ConsumerStatefulWidget {
   const ModelLoadingScreen({super.key});
 
@@ -18,15 +17,15 @@ class ModelLoadingScreen extends ConsumerStatefulWidget {
 
 class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
   bool _didNavigate = false;
+  bool _userChoseLocal = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final status = ref.read(aiModelProvider).status;
-      if (status == AiModelStatus.notDownloaded ||
-          status == AiModelStatus.error) {
-        ref.read(aiModelProvider.notifier).downloadAndInit();
+      final cloudConfig = ref.read(cloudAiConfigProvider);
+      if (cloudConfig.enabled && !_userChoseLocal) {
+        _navigateToChat();
       }
     });
   }
@@ -39,18 +38,29 @@ class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
     );
   }
 
+  void _useCloud() {
+    _navigateToChat();
+  }
+
+  void _downloadLocal() {
+    _userChoseLocal = true;
+    ref.read(aiModelProvider.notifier).downloadAndInit();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.theme.colors;
     final typography = context.theme.typography;
 
     ref.listen(aiModelProvider, (_, next) {
-      if (next.status == AiModelStatus.ready) {
+      if (next.status == AiModelStatus.ready && _userChoseLocal) {
         _navigateToChat();
       }
     });
 
     final modelState = ref.watch(aiModelProvider);
+    final showChoice =
+        modelState.status == AiModelStatus.notDownloaded && !_userChoseLocal;
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -73,17 +83,62 @@ class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            if (modelState.status != AiModelStatus.error)
+            if (showChoice)
+              _ChoiceSection(
+                onUseCloud: _useCloud,
+                onDownloadLocal: _downloadLocal,
+              ),
+            if (!showChoice && modelState.status != AiModelStatus.error)
               _ProgressSection(state: modelState),
             if (modelState.status == AiModelStatus.error)
               _ErrorSection(
                 errorMessage: modelState.errorMessage,
-                onRetry: () =>
-                    ref.read(aiModelProvider.notifier).downloadAndInit(),
+                onRetry: () {
+                  _userChoseLocal = true;
+                  ref.read(aiModelProvider.notifier).downloadAndInit();
+                },
               ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ChoiceSection extends StatelessWidget {
+  final VoidCallback onUseCloud;
+  final VoidCallback onDownloadLocal;
+
+  const _ChoiceSection({
+    required this.onUseCloud,
+    required this.onDownloadLocal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.theme.colors;
+    final typography = context.theme.typography;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Choose how to use Natsya AI',
+          style: typography.sm.copyWith(color: colors.mutedForeground),
+        ),
+        const SizedBox(height: 24),
+        FButton(
+          key: const Key('model_choice_cloud'),
+          onPress: onUseCloud,
+          child: const Text('Use Cloud AI'),
+        ),
+        const SizedBox(height: 12),
+        FButton(
+          key: const Key('model_choice_local'),
+          onPress: onDownloadLocal,
+          child: const Text('Download Local Model'),
+        ),
+      ],
     );
   }
 }

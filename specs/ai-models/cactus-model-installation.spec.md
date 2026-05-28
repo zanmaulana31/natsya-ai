@@ -1,6 +1,6 @@
 ---
 name: Cactus Model Installation
-description: Download, initialize, and manage the Cactus LFM2.5 1.2B Thinking model for on-device inference in the SmartAI Flutter app
+description: Download, initialize, and manage the Cactus LFM 2 350M model for on-device inference in the SmartAI Flutter app
 targets:
   - ../smartai_chat/lib/services/ai_model_service.dart
   - ../smartai_chat/lib/providers/ai_model_provider.dart
@@ -11,7 +11,7 @@ targets:
 
 ## Model Identity
 
-- Target model slug is `lfm2.5-1.2b-thinking` (Cactus LFM2.5 1.2B Thinking)
+- Target model slug is `lfm2-350m` (Cactus LFM 2 350M)
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`
 - Model supports text completion, streaming, and tool calling
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`
@@ -49,7 +49,7 @@ enum AiModelStatus {
 
 ### Download Model
 
-- `downloadModel()` calls `CactusLM.downloadModel(model: 'lfm2.5-1.2b-thinking')` with an optional progress callback
+- `downloadModel()` calls `CactusLM.downloadModel(model: 'lfm2-350m')` with an optional progress callback
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`
 - Download reports progress as `double` from `0.0` to `1.0`
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`
@@ -60,7 +60,7 @@ enum AiModelStatus {
 
 ### Initialize Model
 
-- `initializeModel()` calls `CactusLM.initializeModel()` with `CactusInitParams(model: 'lfm2.5-1.2b-thinking', contextSize: 2048)`
+- `initializeModel()` calls `CactusLM.initializeModel()` with `CactusInitParams(model: 'lfm2-350m', contextSize: 2048)`
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`
 - Status transitions to `AiModelStatus.initializing` before initialization begins
   `[@test] ../smartai_chat/test/services/ai_model_service_test.dart`

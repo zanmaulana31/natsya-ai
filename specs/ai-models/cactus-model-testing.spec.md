@@ -1,6 +1,6 @@
 ---
 name: Cactus Model Testing
-description: Unit and integration tests that verify the Cactus SDK is installed, the LFM2.5 1.2B Thinking model can be downloaded and initialized, and AI inference runs successfully
+description: Unit and integration tests that verify the Cactus SDK is installed, the LFM 2 350M model can be downloaded and initialized, and AI inference runs successfully
 targets:
   - ../smartai_chat/test/
 ---
