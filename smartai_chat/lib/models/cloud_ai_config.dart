@@ -1,6 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-String _envApiKey() => const String.fromEnvironment('CLOUD_API_KEY');
+String _envApiKey() {
+  final fromDotenv = dotenv.env['CLOUD_API_KEY']?.trim();
+  if (fromDotenv != null && fromDotenv.isNotEmpty) return fromDotenv;
+  return const String.fromEnvironment('CLOUD_API_KEY').trim();
+}
 
 @immutable
 class CloudAiConfig {

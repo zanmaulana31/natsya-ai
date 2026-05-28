@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser, AuthException;
 
@@ -7,16 +10,25 @@ import 'auth_exceptions.dart';
 
 class LoginService {
   final SupabaseClient _client;
-  final GoogleSignIn _googleSignIn;
+  late final GoogleSignIn _googleSignIn;
 
-  LoginService(this._client)
-      : _googleSignIn = GoogleSignIn(
-          scopes: [
-            'email',
-            'openid',
-            'profile',
-          ],
-        );
+  LoginService(this._client) {
+    final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID']?.trim();
+    final dartDefineClientId =
+        const String.fromEnvironment('GOOGLE_WEB_CLIENT_ID').trim();
+    final effectiveClientId = (webClientId?.isNotEmpty ?? false)
+        ? webClientId
+        : (dartDefineClientId.isNotEmpty ? dartDefineClientId : null);
+
+    _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'openid',
+        'profile',
+      ],
+      serverClientId: effectiveClientId,
+    );
+  }
 
   Future<AuthUser> signInWithGoogle() async {
     try {
@@ -30,16 +42,20 @@ class LoginService {
       final accessToken = googleAuth.accessToken;
 
       if (idToken == null) {
-        throw AuthException('Google ID Token tidak ditemukan.');
+        throw AuthException(
+          'Google ID Token tidak ditemukan. '
+          'Pastikan GOOGLE_WEB_CLIENT_ID sudah diatur di .env atau --dart-define. '
+          'Lihat SETUP_GOOGLE_OAuth.md untuk panduan mendapatkan Web Client ID.',
+        );
       }
 
-      await _client.auth.signInWithIdToken(
+      final authResponse = await _client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
 
-      final user = _client.auth.currentUser;
+      final user = authResponse.user ?? _client.auth.currentUser;
       if (user == null) {
         throw AuthException('Gagal mendapatkan user setelah sign-in.');
       }
@@ -56,11 +72,26 @@ class LoginService {
       await _client.from('users').upsert(authUser.toJson());
 
       return authUser;
-    } on OAuthCancelledException catch (_) {
+    } on OAuthCancelledException catch (e) {
+      debugPrint('[LoginService] OAuth cancelled: $e');
       rethrow;
-    } on AuthException catch (_) {
+    } on AuthException catch (e) {
+      debugPrint('[LoginService] AuthException: ${e.message}');
       rethrow;
-    } catch (e) {
+    } on PlatformException catch (e) {
+      debugPrint('[LoginService] PlatformException: ${e.code} - ${e.message}');
+      if (e.code == 'sign_in_failed' && e.message?.contains('10:') == true) {
+        throw AuthException(
+          'Google Sign-In gagal (Error 10 / DEVELOPER_ERROR). '
+          'Pastikan: 1) SHA-1 di Google Cloud Console cocok dengan signingReport, '
+          '2) Package name benar (com.smartai.smartai_chat), '
+          '3) OAuth Client ID Android sudah dibuat.',
+        );
+      }
+      throw AuthException('${e.code}: ${e.message}');
+    } catch (e, st) {
+      debugPrint('[LoginService] Unexpected error: $e');
+      debugPrint(st.toString());
       throw AuthException(e.toString());
     }
   }

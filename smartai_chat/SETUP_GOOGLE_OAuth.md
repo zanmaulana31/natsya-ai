@@ -62,20 +62,38 @@ Login berhasil!
    - **Developer contact information**: email Anda
 4. Klik **Save and Continue** sampai selesai
 
-### 1.4 Buat OAuth 2.0 Client ID untuk Android
+### 1.4 Buat OAuth 2.0 Client ID untuk Web (WAJIB untuk ID Token)
+
+> **Penting**: Untuk mendapatkan `idToken` dari Google Sign-In, Anda **wajib** membuat OAuth Client ID tipe **Web application** dan mengaturnya sebagai `serverClientId`.
+
+1. Masuk ke **APIs & Services** → **Credentials**
+2. Klik **Create Credentials** → **OAuth client ID**
+3. Pilih **Application type**: **Web application**
+4. Isi detail:
+    - **Name**: `Natsya AI Web`
+    - **Authorized JavaScript origins**: `http://localhost`
+    - **Authorized redirect URIs**: `http://localhost`
+5. Klik **Create**
+6. Copy **Client ID** (contoh: `123456789-abc123.apps.googleusercontent.com`)
+7. Tambahkan ke file `.env`:
+    ```env
+    GOOGLE_WEB_CLIENT_ID=123456789-abc123.apps.googleusercontent.com
+    ```
+
+### 1.5 Buat OAuth 2.0 Client ID untuk Android
 
 1. Masuk ke **APIs & Services** → **Credentials**
 2. Klik **Create Credentials** → **OAuth client ID**
 3. Pilih **Application type**: **Android**
 4. Isi detail:
-   - **Name**: `Natsya AI Android`
-   - **Package name**: `com.smartai.smartai_chat`
-   - **SHA-1 certificate fingerprint**:
-     ```bash
-     cd android
-     $env:JAVA_HOME = "E:\Android Studio\jbr"; .\gradlew signingReport
-     ```
-     Ambil nilai **SHA1** dari section `:app:signingReport` (contoh: `8A:14:EA:86:36:AB:E8:38:46:4A:D8:1A:70:7B:FA:1C:75:92:52:65`)
+    - **Name**: `Natsya AI Android`
+    - **Package name**: `com.smartai.smartai_chat`
+    - **SHA-1 certificate fingerprint**:
+      ```bash
+      cd android
+      $env:JAVA_HOME = "E:\Android Studio\jbr"; .\gradlew signingReport
+      ```
+      Ambil nilai **SHA1** dari section `:app:signingReport` (contoh: `8A:14:EA:86:36:AB:E8:38:46:4A:D8:1A:70:7B:FA:1C:75:92:52:65`)
 
 5. Klik **Create**
 

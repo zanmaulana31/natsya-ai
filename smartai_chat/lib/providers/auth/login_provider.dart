@@ -35,19 +35,19 @@ class AuthNotifier extends AsyncNotifier<AuthUser?> {
     try {
       final user = await _loginService.signInWithGoogle();
       state = AsyncValue.data(user);
-    } on OAuthCancelledException catch (_) {
+    } on OAuthCancelledException catch (e) {
       state = AsyncValue.error(
-        OAuthCancelledException('Masuk dengan Google dibatalkan.'),
+        e,
         StackTrace.current,
       );
-    } on AuthException catch (_) {
+    } on AuthException catch (e) {
       state = AsyncValue.error(
-        AuthException('Gagal masuk. Silakan coba lagi nanti.'),
+        e,
         StackTrace.current,
       );
     } catch (e, st) {
       state = AsyncValue.error(
-        AuthException('Koneksi internet bermasalah. Periksa jaringan Anda.'),
+        AuthException('Koneksi internet bermasalah. Periksa jaringan Anda. ($e)'),
         st,
       );
     }
