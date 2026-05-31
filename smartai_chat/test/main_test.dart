@@ -13,14 +13,6 @@ void main() {
       mainContent = file.readAsStringSync();
     });
 
-    test('imports package:cactus/cactus.dart', () {
-      expect(
-        mainContent.contains("import 'package:cactus/cactus.dart'"),
-        isTrue,
-        reason: 'main.dart must import cactus package',
-      );
-    });
-
     test('calls WidgetsFlutterBinding.ensureInitialized()', () {
       expect(
         mainContent.contains('WidgetsFlutterBinding.ensureInitialized()'),
@@ -29,11 +21,11 @@ void main() {
       );
     });
 
-    test('sets CactusConfig.isTelemetryEnabled = false', () {
+    test('does not eagerly initialize LlmService', () {
       expect(
-        mainContent.contains('CactusConfig.isTelemetryEnabled = false'),
-        isTrue,
-        reason: 'main.dart must disable telemetry',
+        mainContent.contains('LlmService'),
+        isFalse,
+        reason: 'main.dart must not eagerly init LlmService; ModelLoadingScreen handles it',
       );
     });
 

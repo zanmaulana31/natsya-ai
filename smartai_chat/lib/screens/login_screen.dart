@@ -4,7 +4,7 @@ import 'package:forui/forui.dart';
 
 import '../providers/auth/login_provider.dart';
 import '../widgets/login/google_sign_in_button.dart';
-import 'chat_screen.dart';
+import 'model_loading_screen.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -17,7 +17,7 @@ class LoginScreen extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute<void>(
-            builder: (context) => const ChatScreen(),
+            builder: (context) => const ModelLoadingScreen(),
           ),
         );
       });

@@ -19,17 +19,6 @@ class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
   bool _didNavigate = false;
   bool _userChoseLocal = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cloudConfig = ref.read(cloudAiConfigProvider);
-      if (cloudConfig.enabled && !_userChoseLocal) {
-        _navigateToChat();
-      }
-    });
-  }
-
   void _navigateToChat() {
     if (_didNavigate) return;
     _didNavigate = true;
@@ -44,6 +33,7 @@ class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
 
   void _downloadLocal() {
     _userChoseLocal = true;
+    ref.read(cloudAiConfigProvider.notifier).disable();
     ref.read(aiModelProvider.notifier).downloadAndInit();
   }
 
@@ -59,8 +49,7 @@ class _ModelLoadingScreenState extends ConsumerState<ModelLoadingScreen> {
     });
 
     final modelState = ref.watch(aiModelProvider);
-    final showChoice =
-        modelState.status == AiModelStatus.notDownloaded && !_userChoseLocal;
+    final showChoice = !_userChoseLocal && (modelState.status == AiModelStatus.notDownloaded || modelState.status == AiModelStatus.ready);
 
     return Scaffold(
       backgroundColor: colors.background,

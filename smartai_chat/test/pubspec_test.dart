@@ -12,10 +12,16 @@ void main() {
       pubspec = loadYaml(file.readAsStringSync()) as Map;
     });
 
-    test('contains cactus dependency with ^1.3.0', () {
+    test('contains flutter_gemma dependency with ^0.16.3', () {
       final deps = pubspec['dependencies'] as Map;
-      expect(deps.containsKey('cactus'), isTrue);
-      expect(deps['cactus'], '^1.3.0');
+      expect(deps.containsKey('flutter_gemma'), isTrue);
+      expect(deps['flutter_gemma'], '^0.16.3');
+    });
+
+    test('does NOT contain cactus dependency', () {
+      final deps = pubspec['dependencies'] as Map;
+      expect(deps.containsKey('cactus'), isFalse,
+          reason: 'cactus SDK must be removed');
     });
 
     test('contains flutter_local_notifications dependency with ^17.2.1', () {
@@ -24,35 +30,10 @@ void main() {
       expect(deps['flutter_local_notifications'], '^17.2.1');
     });
 
-    test('flutter pub get resolves flutter_local_notifications', () {
-      final lockFile = File('pubspec.lock');
-      if (!lockFile.existsSync()) {
-        markTestSkipped('pubspec.lock not found; run flutter pub get first');
-        return;
-      }
-      final lock = loadYaml(lockFile.readAsStringSync()) as Map;
-      final packages = lock['packages'] as Map;
-      expect(packages.containsKey('flutter_local_notifications'), isTrue,
-          reason: 'flutter_local_notifications must be in pubspec.lock');
-    });
-
     test('declares n_logo.png asset', () {
       final flutter = pubspec['flutter'] as Map;
       final assets = flutter['assets'] as List;
       expect(assets, contains('assets/images/n_logo.png'));
-    });
-
-    test('flutter pub get resolves cactus', () {
-      // If pubspec.lock exists, verify cactus is present
-      final lockFile = File('pubspec.lock');
-      if (!lockFile.existsSync()) {
-        markTestSkipped('pubspec.lock not found; run flutter pub get first');
-        return;
-      }
-      final lock = loadYaml(lockFile.readAsStringSync()) as Map;
-      final packages = lock['packages'] as Map;
-      expect(packages.containsKey('cactus'), isTrue,
-          reason: 'cactus must be in pubspec.lock');
     });
   });
 }

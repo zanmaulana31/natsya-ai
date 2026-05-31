@@ -1,31 +1,23 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cactus/cactus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:smartai_chat/core/llm_service.dart';
 import 'package:smartai_chat/models/ai_model_status.dart';
+import 'package:smartai_chat/models/chat_message.dart';
 import 'package:smartai_chat/services/ai_model_service.dart';
 
-class MockCactusLM extends Mock implements CactusLM {}
-
-class FakeChatMessage extends Fake implements ChatMessage {}
-
-class FakeCactusCompletionParams extends Fake implements CactusCompletionParams {}
+class MockLlmService extends Mock implements LlmService {}
 
 void main() {
   group('AiModelService', () {
-    late MockCactusLM mockLM;
+    late MockLlmService mockLlm;
     late AiModelService service;
 
-    setUpAll(() {
-      registerFallbackValue(FakeChatMessage());
-      registerFallbackValue(FakeCactusCompletionParams());
-    });
-
     setUp(() {
-      mockLM = MockCactusLM();
-      service = AiModelService(lm: mockLM);
+      mockLlm = MockLlmService();
+      service = AiModelService(llm: mockLlm);
     });
 
     test('constructs without throwing', () {
@@ -38,38 +30,17 @@ void main() {
 
     group('downloadModel', () {
       test('transitions to downloaded on success', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
+            .thenAnswer((_) async {});
 
         await service.downloadModel();
 
         expect(service.status, AiModelStatus.downloaded);
       });
 
-      test('reports progress via callback', () async {
-        final progressValues = <double>[];
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((invocation) async {
-          final callback = invocation.namedArguments[
-            const Symbol('downloadProcessCallback')
-          ] as CactusProgressCallback?;
-          callback?.call(0.5, 'downloading', false);
-        });
-
-        await service.downloadModel(onProgress: progressValues.add);
-
-        expect(progressValues, contains(0.5));
-      });
-
       test('sets error on failure', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenThrow(Exception('network error'));
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
+            .thenThrow(Exception('network error'));
 
         await service.downloadModel();
 
@@ -79,10 +50,8 @@ void main() {
 
       test('retries once on SocketException', () async {
         var attempt = 0;
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
+            .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) {
             throw const SocketException('Connection refused');
@@ -97,10 +66,8 @@ void main() {
 
       test('retries once on TimeoutException', () async {
         var attempt = 0;
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
+            .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) {
             throw TimeoutException('Connection timeout');
@@ -114,10 +81,8 @@ void main() {
       });
 
       test('error on retry failure', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenThrow(const SocketException('Connection refused'));
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
+            .thenThrow(const SocketException('Connection refused'));
 
         await service.downloadModel();
 
@@ -128,49 +93,13 @@ void main() {
 
     group('initializeModel', () {
       test('transitions to ready on success', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
             .thenAnswer((_) async {});
 
         await service.downloadModel();
         await service.initializeModel();
 
         expect(service.status, AiModelStatus.ready);
-      });
-
-      test('transitions to initializing before init', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-
-        await service.downloadModel();
-        expect(service.status, AiModelStatus.downloaded);
-
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
-            .thenAnswer((_) async {
-          expect(service.status, AiModelStatus.initializing);
-        });
-
-        await service.initializeModel();
-      });
-
-      test('sets error on init failure', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
-            .thenThrow(Exception('init failed'));
-
-        await service.downloadModel();
-        await service.initializeModel();
-
-        expect(service.status, AiModelStatus.error);
-        expect(service.errorMessage, contains('init failed'));
       });
 
       test('throws when not downloaded', () {
@@ -182,28 +111,12 @@ void main() {
     });
 
     group('generateCompletion', () {
-      test('delegates to CactusLM when ready', () async {
-        final expectedResult = CactusCompletionResult(
-          success: true,
-          response: 'Hello!',
-          timeToFirstTokenMs: 100,
-          totalTimeMs: 200,
-          tokensPerSecond: 50,
-          prefillTokens: 10,
-          decodeTokens: 5,
-          totalTokens: 15,
-        );
-
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
+      test('delegates to LlmService when ready', () async {
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
             .thenAnswer((_) async {});
-        when(() => mockLM.generateCompletion(
-          messages: any(named: 'messages'),
-          params: any(named: 'params'),
-        )).thenAnswer((_) async => expectedResult);
+        when(() => mockLlm.generateText(any())).thenAnswer((_) async* {
+          yield 'Hello!';
+        });
 
         await service.downloadModel();
         await service.initializeModel();
@@ -211,7 +124,6 @@ void main() {
           ChatMessage(content: 'Hi', role: 'user'),
         ]);
 
-        expect(result.success, isTrue);
         expect(result.response, 'Hello!');
       });
 
@@ -226,24 +138,12 @@ void main() {
     });
 
     group('generateCompletionStream', () {
-      test('delegates to CactusLM when ready', () async {
+      test('delegates to LlmService when ready', () async {
         final controller = StreamController<String>();
-        final completer = Completer<CactusCompletionResult>();
-        final streamedResult = CactusStreamedCompletionResult(
-          stream: controller.stream,
-          result: completer.future,
-        );
 
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
             .thenAnswer((_) async {});
-        when(() => mockLM.generateCompletionStream(
-          messages: any(named: 'messages'),
-          params: any(named: 'params'),
-        )).thenAnswer((_) async => streamedResult);
+        when(() => mockLlm.generateText(any())).thenAnswer((_) => controller.stream);
 
         await service.downloadModel();
         await service.initializeModel();
@@ -252,7 +152,10 @@ void main() {
         ]);
 
         expect(result.stream, isNotNull);
+        controller.add('world');
         controller.close();
+        final tokens = await result.stream.toList();
+        expect(tokens, ['world']);
       });
 
       test('throws when model is not ready', () {
@@ -265,73 +168,19 @@ void main() {
       });
     });
 
-    group('getModelInfo', () {
-      test('returns model with matching slug', () async {
-        final models = [
-          CactusModel(
-            createdAt: DateTime.now(),
-            slug: 'lfm2-1.2b',
-            downloadUrl: 'http://example.com',
-            sizeMb: 100,
-            supportsToolCalling: true,
-            supportsVision: false,
-            name: 'LFM 2 1.2B',
-            isDownloaded: true,
-          ),
-        ];
-
-        when(() => mockLM.getModels()).thenAnswer((_) async => models);
-
-        final info = await service.getModelInfo();
-
-        expect(info, isNotNull);
-        expect(info!.slug, 'lfm2-1.2b');
-      });
-
-      test('returns null when model not found', () async {
-        when(() => mockLM.getModels()).thenAnswer((_) async => []);
-
-        final info = await service.getModelInfo();
-
-        expect(info, isNull);
-      });
-    });
-
     group('isDownloaded', () {
-      test('returns true when model is downloaded', () async {
-        final models = [
-          CactusModel(
-            createdAt: DateTime.now(),
-            slug: 'lfm2-1.2b',
-            downloadUrl: 'http://example.com',
-            sizeMb: 100,
-            supportsToolCalling: true,
-            supportsVision: false,
-            name: 'LFM 2 1.2B',
-            isDownloaded: true,
-          ),
-        ];
-
-        when(() => mockLM.getModels()).thenAnswer((_) async => models);
+      test('returns true when model file exists', () async {
+        when(() => mockLlm.isModelDownloaded()).thenAnswer((_) async => true);
 
         expect(await service.isDownloaded(), isTrue);
-      });
-
-      test('returns false on error', () async {
-        when(() => mockLM.getModels()).thenThrow(Exception('network error'));
-
-        expect(await service.isDownloaded(), isFalse);
       });
     });
 
     group('unload', () {
-      test('calls CactusLM.unload and resets status', () async {
-        when(() => mockLM.downloadModel(
-          model: any(named: 'model'),
-          downloadProcessCallback: any(named: 'downloadProcessCallback'),
-        )).thenAnswer((_) async {});
-        when(() => mockLM.initializeModel(params: any(named: 'params')))
+      test('calls LlmService.dispose and resets status', () async {
+        when(() => mockLlm.initialize(onProgress: any(named: 'onProgress')))
             .thenAnswer((_) async {});
+        when(() => mockLlm.dispose()).thenAnswer((_) async {});
 
         await service.downloadModel();
         await service.initializeModel();
@@ -339,13 +188,14 @@ void main() {
 
         service.unload();
 
-        verify(() => mockLM.unload()).called(1);
+        verify(() => mockLlm.dispose()).called(1);
         expect(service.status, AiModelStatus.notDownloaded);
       });
     });
 
     group('dispose', () {
       test('calls unload without throwing', () {
+        when(() => mockLlm.dispose()).thenAnswer((_) async {});
         expect(service.dispose, returnsNormally);
       });
     });

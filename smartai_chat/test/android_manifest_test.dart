@@ -43,5 +43,13 @@ void main() {
         isTrue,
       );
     });
+
+    test('has WRITE_EXTERNAL_STORAGE permission', () {
+      expect(
+        manifest.contains(
+            'android:name="android.permission.WRITE_EXTERNAL_STORAGE"'),
+        isTrue,
+      );
+    });
   });
 }

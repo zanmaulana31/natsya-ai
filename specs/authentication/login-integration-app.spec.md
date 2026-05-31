@@ -1,6 +1,6 @@
 ---
 name: Login Integration — App Entry
-description: Integrasi LoginScreen ke main.dart sebagai entry point pertama sebelum ChatScreen atau ModelLoadingScreen.
+description: Integrasi LoginScreen ke main.dart — entry point pertama, dilanjutkan ke ModelLoadingScreen untuk memilih cloud AI atau download local model.
 targets:
   - ../smartai_chat/lib/main.dart
 ---
@@ -24,12 +24,9 @@ class SmartAiApp extends ConsumerWidget {
   `[@test] ../smartai_chat/test/main_test.dart`
 - Jika `authProvider` state adalah `AsyncValue.data(null)` atau user belum login, tampilkan `LoginScreen` sebagai `home`.
   `[@test] ../smartai_chat/test/main_test.dart`
-- Jika `authProvider` state adalah `AsyncValue.data(user)` dengan `user != null` (sudah login), lanjutkan ke logika existing:
-  - Cek `cloudAiConfigProvider` dan `aiModelProvider`
-  - Jika `cloudConfig.enabled == true` atau `modelState.status == AiModelStatus.ready`, tampilkan `ChatScreen`
-  - Selain itu, tampilkan `ModelLoadingScreen`
+- Jika `authProvider` state adalah `AsyncValue.data(user)` dengan `user != null` (sudah login), `home` selalu `ModelLoadingScreen`
   `[@test] ../smartai_chat/test/main_test.dart`
-- Urutan prioritas screen: **LoginScreen** → **ChatScreen** / **ModelLoadingScreen**.
+- Urutan prioritas screen: **LoginScreen** → **ModelLoadingScreen** → **ChatScreen** (setelah user pilih).
   `[@test] ../smartai_chat/test/main_test.dart`
 - Navigation dari `LoginScreen` ke `ChatScreen` tetap di-handle oleh `LoginScreen` sendiri via `Navigator.pushReplacement` saat `authProvider` emit user login.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`

@@ -1,6 +1,6 @@
 ---
 name: Login Screen
-description: Login screen for Google OAuth authentication with Natsya AI branding, inline error handling, and auto-redirect to ChatScreen.
+description: Login screen for Google OAuth authentication with Natsya AI branding, inline error handling, and auto-redirect to ModelLoadingScreen.
 targets:
   - ../smartai_chat/lib/screens/login_screen.dart
   - ../smartai_chat/lib/widgets/login/google_sign_in_button.dart
@@ -33,10 +33,12 @@ class LoginScreen extends ConsumerWidget {
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
 - Di bawah nama menampilkan tagline kecil (misal: "Your personal AI assistant") dengan style muted/secondary.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
-- Jika `authProvider` state adalah `AsyncValue.data(user)` dan `user != null`, auto-redirect ke `ChatScreen` menggunakan `Navigator.pushReplacement`.
+- Jika `authProvider` state adalah `AsyncValue.data(user)` dan `user != null`, auto-redirect ke `ModelLoadingScreen` menggunakan `Navigator.pushReplacement`.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
 - Jika user sudah login saat screen pertama kali dibuka, redirect langsung terjadi tanpa flicker UI login.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
+- `ModelLoadingScreen` kemudian menangani pilihan cloud AI vs download model lokal sebelum masuk ke `ChatScreen`.
+  `[@test] ../smartai_chat/test/screens/model_loading_screen_test.dart`
 
 ## GoogleSignInButton
 
@@ -79,12 +81,18 @@ class GoogleSignInButton extends ConsumerWidget {
 
 ## Redirect Rules
 
-- Saat `authProvider` emit `AsyncValue.data(user)` dengan `user != null`, `LoginScreen` segera navigasi ke `ChatScreen` via `Navigator.pushReplacement`.
+- Saat `authProvider` emit `AsyncValue.data(user)` dengan `user != null`, `LoginScreen` segera navigasi ke `ModelLoadingScreen` via `Navigator.pushReplacement`.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
 - Jika user membuka app dan sudah dalam keadaan login (session valid), `LoginScreen` tidak sempat render konten login — langsung redirect.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
 - Redirect hanya terjadi sekali; tidak ada infinite loop navigasi.
   `[@test] ../smartai_chat/test/screens/login_screen_test.dart`
+- `ModelLoadingScreen` yang memutuskan langkah selanjutnya (tidak ada auto-redirect):
+  - Jika user tap **"Use Cloud AI"** → navigasi ke `ChatScreen`.
+  - Jika user tap **"Download Local Model"**:
+    - Jika `AiModelStatus.ready` (model sudah ada) → langsung navigasi ke `ChatScreen`.
+    - Jika `AiModelStatus.notDownloaded` → download + init → navigasi ke `ChatScreen` setelah `ready`.
+  `[@test] ../smartai_chat/test/screens/model_loading_screen_test.dart`
 
 ## Rules & Constraints
 

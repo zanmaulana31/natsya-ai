@@ -1,8 +1,8 @@
-import 'package:cactus/cactus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smartai_chat/models/ai_model_status.dart';
+import 'package:smartai_chat/models/completion_result.dart';
 import 'package:smartai_chat/providers/ai_model_provider.dart';
 import 'package:smartai_chat/services/ai_model_service.dart';
 
@@ -100,16 +100,7 @@ void main() {
 
     group('generate', () {
       test('wraps user message and delegates to service', () async {
-        final expectedResult = CactusCompletionResult(
-          success: true,
-          response: 'Hello!',
-          timeToFirstTokenMs: 100,
-          totalTimeMs: 200,
-          tokensPerSecond: 50,
-          prefillTokens: 10,
-          decodeTokens: 5,
-          totalTokens: 15,
-        );
+        final expectedResult = CompletionResult(response: 'Hello!');
 
         when(() => mockService.downloadModel(onProgress: any(named: 'onProgress')))
             .thenAnswer((_) async {});
@@ -122,7 +113,6 @@ void main() {
         await container.read(aiModelProvider.notifier).downloadAndInit();
         final result = await container.read(aiModelProvider.notifier).generate('Hi');
 
-        expect(result.success, isTrue);
         expect(result.response, 'Hello!');
       });
     });

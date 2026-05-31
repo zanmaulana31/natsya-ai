@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:cactus/cactus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/ai_model_status.dart';
+import '../models/chat_message.dart';
 import '../models/message.dart';
-import '../mock/mock_data.dart';
 import '../services/ai_model_service.dart';
 import '../services/cloud_ai_service.dart';
 import 'ai_model_provider.dart';
@@ -33,7 +32,7 @@ class ChatNotifier extends Notifier<ChatState> {
     ref.onDispose(() {
       _streamSubscription?.cancel();
     });
-    return ChatState(messages: MockData.messages);
+    return ChatState(messages: []);
   }
 
   Future<void> sendMessage(String text, {AiResponseMode mode = AiResponseMode.complete}) async {

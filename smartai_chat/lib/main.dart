@@ -1,26 +1,18 @@
-import 'package:cactus/cactus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'models/ai_model_status.dart';
 import 'models/supabase_config.dart';
-import 'providers/ai_model_provider.dart';
 import 'providers/auth/login_provider.dart';
-import 'providers/cloud_ai_provider.dart';
 import 'providers/theme_provider.dart';
-import 'screens/chat_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/model_loading_screen.dart';
 import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Cactus SDK configuration
-  CactusConfig.isTelemetryEnabled = false;
 
   // Initialize local notifications
   await NotificationService.instance.initialize();
@@ -65,13 +57,7 @@ class SmartAiApp extends ConsumerWidget {
         ),
       );
     } else if (authState is AsyncData && authState.value != null) {
-      final cloudConfig = ref.watch(cloudAiConfigProvider);
-      final modelState = ref.watch(aiModelProvider);
-      if (cloudConfig.enabled || modelState.status == AiModelStatus.ready) {
-        home = const ChatScreen();
-      } else {
-        home = const ModelLoadingScreen();
-      }
+      home = const ModelLoadingScreen();
     } else {
       home = const LoginScreen();
     }
