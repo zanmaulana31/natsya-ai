@@ -1,7 +1,7 @@
 {
   "name": "jeffallan/claude-skills",
   "version": "e8be415bc94d8d6ebddc2fb50e5d03c6e27d4319",
-  "summary": "Auto-generated tile from GitHub (66 skills)",
+  "summary": "Auto-generated plugin from GitHub (66 skills)",
   "private": true,
   "skills": {
     "flutter-expert": {

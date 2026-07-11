@@ -1,7 +1,7 @@
 {
   "name": "samzong/samzong",
   "version": "8932c2ed7924f790a90c163192d52f4e82468ab4",
-  "summary": "Auto-generated tile from GitHub (16 skills)",
+  "summary": "Auto-generated plugin from GitHub (16 skills)",
   "private": true,
   "skills": {
     "codewiki-generator": {
